@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="16dp"
@@ -9,8 +8,20 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- RecyclerView that will hold and display the movie thumbnails -->
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview_movies"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:clipToPadding="true"
+        android:paddingBottom="8dp"/>
+
+    <!-- Progress bar that will be shown to users to indicate content is being loaded -->
+    <ProgressBar
+        android:id="@+id/pb_loading_indicator"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_gravity="center"
+        android:visibility="invisible" />
 
 </LinearLayout>
