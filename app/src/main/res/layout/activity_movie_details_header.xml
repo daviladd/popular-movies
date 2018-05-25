@@ -55,7 +55,7 @@
         app:layout_constraintEnd_toStartOf="@+id/movie_details_horizontal_middle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/fight_club_poster_thumbnail"/>
+        tools:src="@android:drawable/ic_menu_report_image"/>
     <!-- TextView with the user rating -->
     <TextView
         android:id="@+id/movie_details_user_rating_label"
