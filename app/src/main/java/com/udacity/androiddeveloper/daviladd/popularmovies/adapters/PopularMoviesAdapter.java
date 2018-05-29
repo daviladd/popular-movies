@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.udacity.androiddeveloper.daviladd.popularmovies.PopularMovie;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
 
 import java.util.List;
@@ -24,17 +24,17 @@ public class PopularMoviesAdapter
 
     private Context mContext;
 
-    private List<PopularMovie> mPopularMovies;
+    private List<Movie> mMovies;
 
-    public PopularMoviesAdapter(@NonNull Context context, List<PopularMovie> popularMovies) {
+    public PopularMoviesAdapter(@NonNull Context context, List<Movie> movies) {
         mContext = context;
-        mPopularMovies = popularMovies;
+        mMovies = movies;
     }
 
 
     @Override
     public int getItemCount() {
-        return mPopularMovies.size();
+        return mMovies.size();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class PopularMoviesAdapter
 
     @Override
     public void onBindViewHolder(PopularMoviesViewHolder holder, int position) {
-        holder.movieOriginalTitle.setText(mPopularMovies.get(position).getOriginalTitle());
+        holder.movieOriginalTitle.setText(mMovies.get(position).getOriginalTitle());
         holder.moviePosterThumbnail.setImageResource(android.R.drawable.ic_menu_report_image);
     }
 

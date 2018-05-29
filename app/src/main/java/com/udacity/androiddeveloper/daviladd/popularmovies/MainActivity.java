@@ -1,10 +1,8 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies;
 
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,12 +12,10 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.PopularMoviesAdapter;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -98,15 +94,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    List<PopularMovie> createFakeMovies(int quantity) {
-        List<PopularMovie> popularMovies = new ArrayList<>();
+    List<Movie> createFakeMovies(int quantity) {
+        List<Movie> movies = new ArrayList<>();
 
         for (int i = 0; i < quantity; i++) {
-            PopularMovie movie = new PopularMovie();
-            movie.setOriginalTitle("Movie " + i);
-            popularMovies.add(movie);
+            Movie movie = new Movie();
+            movie.setTitle("Movie " + i);
+            movies.add(movie);
         }
 
-        return popularMovies;
+        return movies;
     }
 }
