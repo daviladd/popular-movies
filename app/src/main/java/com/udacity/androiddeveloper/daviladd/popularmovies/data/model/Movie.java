@@ -1,6 +1,7 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies.data.model;
 
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -51,13 +52,11 @@ public class Movie {
 
     /**
      * No args constructor for use in serialization
-     *
      */
     public Movie() {
     }
 
     /**
-     *
      * @param genreIds
      * @param id
      * @param title

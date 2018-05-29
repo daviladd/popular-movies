@@ -61,6 +61,11 @@ public class PopularMoviesAdapter
         holder.moviePosterThumbnail.setImageResource(android.R.drawable.ic_menu_report_image);
     }
 
+    public void updateAnswers(List<Movie> movies) {
+        mMovies = movies;
+        notifyDataSetChanged();
+    }
+
     public static class PopularMoviesViewHolder extends RecyclerView.ViewHolder
             //        implements View.OnClickListener
     {

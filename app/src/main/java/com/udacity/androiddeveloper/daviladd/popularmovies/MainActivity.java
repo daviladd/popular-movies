@@ -1,9 +1,11 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies;
 
+import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,11 +15,20 @@ import android.widget.Toast;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.PopularMoviesAdapter;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+
 public class MainActivity extends AppCompatActivity {
+    private final String TAG = MainActivity.class.getSimpleName();
 
     private PopularMoviesAdapter mPopularMoviesAdapter;
     private RecyclerView mRecyclerView;
@@ -45,6 +56,40 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: show the progress bar while the data is being fetched and loaded
         //loadindIndicatorShow();
+
+        getMoviesByPopularity();
+
+    }
+
+    private void getMoviesByPopularity(){
+        Log.d(TAG, "Trying to retrieve movies by Popularity");
+        Retrofit retrofit = TMDBRetrofitClient.getClient();
+
+        TMDBRetrofitService apiServiceTmdb = retrofit.create(TMDBRetrofitService.class);
+        String apiKey = getString(R.string.API_KEY_TMDB);
+
+        Call<MovieList> call = apiServiceTmdb
+                .getMoviesByPopularity(apiKey);
+        call.enqueue(new Callback<MovieList>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<MovieList> call, Response<MovieList> movieListResponse) {
+                        if (movieListResponse.isSuccessful()) {
+                            Log.d(TAG, "List of movies sorted by popularity has been successfully retrieved");
+                            mPopularMoviesAdapter.updateAnswers(movieListResponse.body().getResults());
+                        } else {
+                            Log.d(TAG, "List of movies sorted by popularity could not be retrieved");
+                            int statusCode = movieListResponse.code();
+                            // TODO: handle error on request depending on the status code
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<MovieList> call, Throwable t) {
+                        Log.d(TAG, "Error while loading from TMDB API");
+
+                    }
+                });
+
 
     }
 

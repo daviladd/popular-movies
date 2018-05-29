@@ -8,7 +8,7 @@ public class TMDBRetrofitClient {
 
     private static final String BASE_URL = "http://api.themoviedb.org/3/";
 
-    static Retrofit getClient() {
+    public static Retrofit getClient() {
 
         if (null == retrofit) {
             retrofit = new Retrofit.Builder()
