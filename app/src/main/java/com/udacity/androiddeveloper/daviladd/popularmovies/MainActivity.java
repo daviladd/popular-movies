@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mPopularMoviesAdapter);
 
         // TODO: show the progress bar while the data is being fetched and loaded
-        //loadindIndicatorShow();
+        loadindIndicatorShow();
 
         getMoviesByPopularity();
 
@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<MovieList>() {
                     @Override
                     public void onResponse(retrofit2.Call<MovieList> call, Response<MovieList> movieListResponse) {
+                        loadindIndicatorHide();
                         if (movieListResponse.isSuccessful()) {
                             Log.d(TAG, "List of movies sorted by popularity has been successfully retrieved");
                             mPopularMoviesAdapter.updateAnswers(movieListResponse.body().getResults());
@@ -85,12 +86,41 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(retrofit2.Call<MovieList> call, Throwable t) {
-                        Log.d(TAG, "Error while loading from TMDB API");
-
+                        loadindIndicatorHide();
+                        Log.d(TAG, "Error while loading from TMDB API while trying to retrieve movies by popularity");
                     }
                 });
+    }
 
+    private void getMoviesByUserRating(){
+        Log.d(TAG, "Trying to retrieve movies by Rating");
+        Retrofit retrofit = TMDBRetrofitClient.getClient();
 
+        TMDBRetrofitService apiServiceTmdb = retrofit.create(TMDBRetrofitService.class);
+        String apiKey = getString(R.string.API_KEY_TMDB);
+
+        Call<MovieList> call = apiServiceTmdb
+                .getMoviesByUserRating(apiKey);
+        call.enqueue(new Callback<MovieList>() {
+            @Override
+            public void onResponse(retrofit2.Call<MovieList> call, Response<MovieList> movieListResponse) {
+                loadindIndicatorHide();
+                if (movieListResponse.isSuccessful()) {
+                    Log.d(TAG, "List of movies sorted by user rating has been successfully retrieved");
+                    mPopularMoviesAdapter.updateAnswers(movieListResponse.body().getResults());
+                } else {
+                    Log.d(TAG, "List of movies sorted by user rating could not be retrieved");
+                    int statusCode = movieListResponse.code();
+                    // TODO: handle error on request depending on the status code
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<MovieList> call, Throwable t) {
+                loadindIndicatorHide();
+                Log.d(TAG, "Error while loading from TMDB API while trying to retrieve movies by user rating");
+            }
+        });
     }
 
     @Override
@@ -109,12 +139,14 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this,
                         getText(R.string.debug_menu_sort_method_popularity),
                         Toast.LENGTH_LONG).show();
+                getMoviesByPopularity();
                 return true;
             case R.id.menu_sort_method_rating:
                 // TODO: get the new data sorted by user rating
                 Toast.makeText(this,
                         getText(R.string.debug_menu_sort_method_rating),
                         Toast.LENGTH_LONG).show();
+                getMoviesByUserRating();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

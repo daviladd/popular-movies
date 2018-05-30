@@ -17,5 +17,5 @@ public interface TMDBRetrofitService {
     Call<MovieList> getMoviesByPopularity(@Query(API_KEY) String apiKey);
 
     @GET(RATING)
-    Call<MovieList> getMoviesByRating(@Query(API_KEY) String apiKey);
+    Call<MovieList> getMoviesByUserRating(@Query(API_KEY) String apiKey);
 }
