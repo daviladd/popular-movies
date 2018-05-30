@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
         // Create a layout manager to handle the item views on the RecyclerView:
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
 
         //  Associate the layout manager with the RecyclerView:
         mRecyclerView.setLayoutManager(layoutManager);

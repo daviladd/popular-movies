@@ -9,8 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
 
 import java.util.List;
 
@@ -58,7 +60,9 @@ public class PopularMoviesAdapter
     @Override
     public void onBindViewHolder(PopularMoviesViewHolder holder, int position) {
         holder.movieOriginalTitle.setText(mMovies.get(position).getOriginalTitle());
-        holder.moviePosterThumbnail.setImageResource(android.R.drawable.ic_menu_report_image);
+        //holder.moviePosterThumbnail.setImageResource(android.R.drawable.ic_menu_report_image);
+        String thumbnailPath = "http://image.tmdb.org/t/p/w342" + mMovies.get(position).getPosterPath();
+        Picasso.get().load(thumbnailPath).into(holder.moviePosterThumbnail);
     }
 
     public void updateAnswers(List<Movie> movies) {
