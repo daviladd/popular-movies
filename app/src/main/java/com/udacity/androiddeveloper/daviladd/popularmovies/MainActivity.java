@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getMoviesByPopularity(){
+        loadindIndicatorShow();
         Log.d(TAG, "Trying to retrieve movies by Popularity");
         Retrofit retrofit = TMDBRetrofitClient.getClient();
 
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getMoviesByUserRating(){
+        loadindIndicatorShow();
         Log.d(TAG, "Trying to retrieve movies by Rating");
         Retrofit retrofit = TMDBRetrofitClient.getClient();
 
@@ -136,24 +138,32 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_sort_method_popularity:
                 // TODO: get the new data sorted by popularity
+                /*
                 Toast.makeText(this,
                         getText(R.string.debug_menu_sort_method_popularity),
                         Toast.LENGTH_LONG).show();
+                */
+                Log.d(TAG, getString(R.string.debug_menu_sort_method_popularity));
                 getMoviesByPopularity();
                 return true;
             case R.id.menu_sort_method_rating:
                 // TODO: get the new data sorted by user rating
+                /*
                 Toast.makeText(this,
                         getText(R.string.debug_menu_sort_method_rating),
                         Toast.LENGTH_LONG).show();
+                */
+                Log.d(TAG, getString(R.string.debug_menu_sort_method_rating));
                 getMoviesByUserRating();
                 return true;
             default:
+                Log.d(TAG, "Unknown menu option selected");
                 return super.onOptionsItemSelected(item);
         }
     }
 
     private void loadindIndicatorShow() {
+        Log.d(TAG, "Showing loading indicator");
         // Hide the movie items view:
         mRecyclerView.setVisibility(View.INVISIBLE);
         // Show the loading indicator:
@@ -164,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
      * Hides the loading indicator in order to show the
      */
     private void loadindIndicatorHide() {
+        Log.d(TAG, "Hiding loading indicator");
         // Hide the loading indicator:
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         // Show the movie items view:
