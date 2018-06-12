@@ -3,9 +3,14 @@
     <dimen name="movie_details_general_padding">8dp</dimen>
     <dimen name="multiline_text_view_maxlines">2</dimen>
 
+    <!-- For the loading indicator -->
+    <dimen name="loading_indicator_square_size">42dp</dimen>
     <!-- For the CardView -->
     <dimen name="card_margin">8dp</dimen>
     <dimen name="card_elevation">4dp</dimen>
-    <dimen name="card_corner_radius">4dp</dimen>
+    <dimen name="card_corner_radius">8dp</dimen>
+    <dimen name="card_title_text_size">18sp</dimen>
+    <dimen name="card_text_padding_lateral">8dp</dimen>
+    <dimen name="card_text_padding_vertical">4dp</dimen>
 
 </resources>

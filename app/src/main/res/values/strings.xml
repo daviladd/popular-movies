@@ -5,8 +5,8 @@
     <string name="menu_sort_method_popularity">Sort Movies by Popularity</string>
     <string name="menu_sort_method_rating">Sort Movies by Rating</string>
 
-    <string name="movie_details_user_rating_label">User Rating:</string>
-    <string name="movie_details_synopsis_label">Synopsis:</string>
+    <string name="movie_details_user_rating_label">User Rating</string>
+    <string name="movie_details_synopsis_label">Synopsis</string>
 
     <!-- Debug strings -->
     <string name="debug_menu_sort_method_popularity">User selected sorting the movies by popularity</string>
