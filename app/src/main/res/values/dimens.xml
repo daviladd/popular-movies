@@ -3,4 +3,9 @@
     <dimen name="movie_details_general_padding">8dp</dimen>
     <dimen name="multiline_text_view_maxlines">2</dimen>
 
+    <!-- For the CardView -->
+    <dimen name="card_margin">8dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_corner_radius">4dp</dimen>
+
 </resources>
