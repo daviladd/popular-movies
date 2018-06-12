@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
 
-        <include
-            android:id="@+id/movie_details_header"
-            layout="@layout/activity_movie_details_header"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".ui.detail.MovieDetailActivity">
 
-        <include
-            android:id="@+id/movie_details_body"
-            layout="@layout/activity_movie_details_body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            <include
+                android:id="@+id/movie_details_header"
+                layout="@layout/activity_movie_details_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-    </LinearLayout>
+            <include
+                android:id="@+id/movie_details_body"
+                layout="@layout/activity_movie_details_body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </ScrollView>
 </layout>

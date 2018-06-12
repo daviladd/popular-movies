@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="movie_details_general_padding">16dp</dimen>
+    <dimen name="movie_details_general_padding">8dp</dimen>
+    <dimen name="multiline_text_view_maxlines">2</dimen>
+
 </resources>

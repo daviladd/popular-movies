@@ -11,7 +11,7 @@
     <!-- Debug strings -->
     <string name="debug_menu_sort_method_popularity">User selected sorting the movies by popularity</string>
     <string name="debug_menu_sort_method_rating">User selected sorting the movies by rating</string>
-    <string name="debug_movie_details_title">Fight Club</string>
+    <string name="debug_movie_details_title">This is a very long movie title</string>
     <string name="debug_movie_details_release_year">1999</string>
     <string name="debug_movie_details_synopsis_text">A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy. Their concept catches on, with underground \"fight clubs\" forming in every town, until an eccentric gets in the way and ignites an out-of-control spiral toward oblivion.</string>
     <string name="debug_movie_details_user_rating">8.3</string>

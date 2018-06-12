@@ -1,6 +1,7 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies;
 
 import android.content.res.Resources;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,7 +12,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.PopularMoviesAdapter;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
@@ -30,8 +30,21 @@ import retrofit2.Retrofit;
 public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
 
+    private final String MOVIE_LIST_KEY = "movie_list";
+
     private PopularMoviesAdapter mPopularMoviesAdapter;
     private RecyclerView mRecyclerView;
+
+    private MovieList mMovieList;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mMovieList != null) {
+            outState.putParcelable(MOVIE_LIST_KEY, mMovieList);
+        }
+    }
+
     private ProgressBar mLoadingIndicator;
 
 
@@ -54,10 +67,20 @@ public class MainActivity extends AppCompatActivity {
         mPopularMoviesAdapter = new PopularMoviesAdapter(this, createFakeMovies(20));
         mRecyclerView.setAdapter(mPopularMoviesAdapter);
 
-        // TODO: show the progress bar while the data is being fetched and loaded
         loadindIndicatorShow();
 
-        getMoviesByPopularity();
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(MOVIE_LIST_KEY)) {
+                Log.d(TAG, "A movie list was found in the savedInstanceState");
+                mMovieList = savedInstanceState.getParcelable(MOVIE_LIST_KEY);
+                loadindIndicatorHide();
+                mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
+            }
+        } else {
+            // TODO: store the sorting method as a setting, so when the app is started, the user
+            //      gets the same sorting method as when app was closed/destroyed.
+            getMoviesByPopularity();
+        }
 
     }
 
@@ -77,7 +100,8 @@ public class MainActivity extends AppCompatActivity {
                         loadindIndicatorHide();
                         if (movieListResponse.isSuccessful()) {
                             Log.d(TAG, "List of movies sorted by popularity has been successfully retrieved");
-                            mPopularMoviesAdapter.updateAnswers(movieListResponse.body().getResults());
+                            mMovieList = movieListResponse.body();
+                            mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
                         } else {
                             Log.d(TAG, "List of movies sorted by popularity could not be retrieved");
                             int statusCode = movieListResponse.code();
@@ -109,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
                 loadindIndicatorHide();
                 if (movieListResponse.isSuccessful()) {
                     Log.d(TAG, "List of movies sorted by user rating has been successfully retrieved");
-                    mPopularMoviesAdapter.updateAnswers(movieListResponse.body().getResults());
+                    mMovieList = movieListResponse.body();
+                    mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
                 } else {
                     Log.d(TAG, "List of movies sorted by user rating could not be retrieved");
                     int statusCode = movieListResponse.code();
@@ -137,22 +162,10 @@ public class MainActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_sort_method_popularity:
-                // TODO: get the new data sorted by popularity
-                /*
-                Toast.makeText(this,
-                        getText(R.string.debug_menu_sort_method_popularity),
-                        Toast.LENGTH_LONG).show();
-                */
                 Log.d(TAG, getString(R.string.debug_menu_sort_method_popularity));
                 getMoviesByPopularity();
                 return true;
             case R.id.menu_sort_method_rating:
-                // TODO: get the new data sorted by user rating
-                /*
-                Toast.makeText(this,
-                        getText(R.string.debug_menu_sort_method_rating),
-                        Toast.LENGTH_LONG).show();
-                */
                 Log.d(TAG, getString(R.string.debug_menu_sort_method_rating));
                 getMoviesByUserRating();
                 return true;
@@ -180,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
         // Show the movie items view:
         mRecyclerView.setVisibility(View.VISIBLE);
     }
-
 
     List<Movie> createFakeMovies(int quantity) {
         List<Movie> movies = new ArrayList<>();
