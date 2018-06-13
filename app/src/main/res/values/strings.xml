@@ -6,6 +6,8 @@
     <string name="menu_sort_method_rating">Sort Movies by Rating</string>
 
     <string name="movie_details_user_rating_label">User Rating</string>
+    <string name="movie_details_user_rating_over_label">/10</string>
+    <string name="movie_details_release_year_label">Release Year</string>
     <string name="movie_details_synopsis_label">Synopsis</string>
 
     <!-- Debug strings -->

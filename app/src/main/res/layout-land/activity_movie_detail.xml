@@ -11,14 +11,14 @@
             layout="@layout/activity_movie_details_header"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight=".40"/>
+            android:layout_weight=".50"/>
 
         <include
             android:id="@+id/movie_details_body"
             layout="@layout/activity_movie_details_body"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight=".60"/>
+            android:layout_weight=".50"/>
 
     </LinearLayout>
 </layout>

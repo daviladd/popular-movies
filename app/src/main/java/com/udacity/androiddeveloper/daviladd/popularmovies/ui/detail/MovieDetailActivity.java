@@ -1,8 +1,5 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies.ui.detail;
 
-import android.arch.lifecycle.LifecycleActivity;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,10 +22,10 @@ public class MovieDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mActivityMovieDetail = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
+
         // To add the "up" navigation button:
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        mActivityMovieDetail = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
 
         Movie movie = getIntent().getParcelableExtra("MOVIE");
         bindMovieToUI(movie);
@@ -52,9 +49,9 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         mActivityMovieDetail.movieDetailsHeader.movieDetailsTitle.setText(movie.getTitle());
         mActivityMovieDetail.movieDetailsHeader.movieDetailsReleaseDate
-                .setText("(" + Integer.toString(movie.getReleaseYear()) + ")");
-        mActivityMovieDetail.movieDetailsHeader.movieDetailsUserRatingLabel
-                .setText(new DecimalFormat(".#").format(movie.getVoteAverage()) + "/10");
+                .setText(Integer.toString(movie.getReleaseYear()));
+        mActivityMovieDetail.movieDetailsHeader.movieDetailsUserRatingValue
+                .setText(new DecimalFormat(".#").format(movie.getVoteAverage()));
         mActivityMovieDetail.movieDetailsBody.movieDetailsSynopsisValue.setText(movie.getOverview());
 
     }
