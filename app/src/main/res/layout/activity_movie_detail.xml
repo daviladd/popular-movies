@@ -2,15 +2,17 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools">
 
-    <ScrollView android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fillViewport="true">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             tools:context=".ui.detail.MovieDetailActivity">
+
             <TextView
                 android:id="@+id/movie_details_title"
                 android:layout_width="match_parent"
@@ -27,6 +29,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textSize="24sp"
                 tools:text="@string/debug_movie_details_title"/>
+
             <include
                 android:id="@+id/movie_details_header"
                 layout="@layout/activity_movie_details_header"

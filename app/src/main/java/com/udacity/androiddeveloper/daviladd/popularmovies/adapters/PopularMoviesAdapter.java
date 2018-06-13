@@ -11,10 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.udacity.androiddeveloper.daviladd.popularmovies.MainActivity;
-import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
-import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.ui.detail.MovieDetailActivity;
 
 import java.util.List;
@@ -74,8 +72,7 @@ public class PopularMoviesAdapter
     }
 
     public static class PopularMoviesViewHolder extends RecyclerView.ViewHolder
-                    implements View.OnClickListener
-    {
+            implements View.OnClickListener {
 
         final ImageView moviePosterThumbnail;
         final TextView movieOriginalTitle;

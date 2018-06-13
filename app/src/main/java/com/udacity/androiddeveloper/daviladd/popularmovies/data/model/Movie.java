@@ -4,18 +4,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 public class Movie implements Parcelable {
 
@@ -220,7 +217,7 @@ public class Movie implements Parcelable {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(expectedDatePattern);
         try {
             releaseDate = simpleDateFormat.parse(this.getReleaseDate());
-        } catch (ParseException e){
+        } catch (ParseException e) {
             Log.d(TAG, "Error while parsing release date to get a java.Util.Date object");
             return null;
         }
