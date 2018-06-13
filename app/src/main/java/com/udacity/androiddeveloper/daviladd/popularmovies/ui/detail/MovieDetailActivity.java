@@ -47,7 +47,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         String thumbnailPath = "http://image.tmdb.org/t/p/w500" + movie.getPosterPath();
         Picasso.get().load(thumbnailPath).into(mActivityMovieDetail.movieDetailsHeader.movieDetailsPosterThumbnail);
 
-        mActivityMovieDetail.movieDetailsHeader.movieDetailsTitle.setText(movie.getTitle());
+        mActivityMovieDetail.movieDetailsTitle.setText(movie.getTitle());
         mActivityMovieDetail.movieDetailsHeader.movieDetailsReleaseDate
                 .setText(Integer.toString(movie.getReleaseYear()));
         mActivityMovieDetail.movieDetailsHeader.movieDetailsUserRatingValue

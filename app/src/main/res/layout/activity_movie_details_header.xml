@@ -10,38 +10,17 @@
 
         <!-- Vertical line to divide the View in two parts vertically -->
 
-        <TextView
-            android:id="@+id/movie_details_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:ellipsize="end"
-
-            android:fontFamily="sans-serif"
-            android:maxLines="2"
-            android:scrollHorizontally="false"
-            android:singleLine="false"
-
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textSize="24sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/debug_movie_details_title"/>
-
         <ImageView
             android:id="@+id/movie_details_poster_thumbnail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:adjustViewBounds="true"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/movie_details_horizontal_middle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/movie_details_title"
+            app:layout_constraintTop_toTopOf="parent"
             tools:src="@android:drawable/ic_menu_report_image"/>
 
         <android.support.constraint.Guideline
