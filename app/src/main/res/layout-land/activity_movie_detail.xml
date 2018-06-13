@@ -24,25 +24,31 @@
             android:textSize="24sp"
             tools:text="@string/debug_movie_details_title"/>
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:fillViewport="true">
 
-            <include
-                android:id="@+id/movie_details_header"
-                layout="@layout/activity_movie_details_header"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight=".50"/>
+                android:orientation="horizontal">
 
-            <include
-                android:id="@+id/movie_details_body"
-                layout="@layout/activity_movie_details_body"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight=".50"/>
+                <include
+                    android:id="@+id/movie_details_header"
+                    layout="@layout/activity_movie_details_header"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".50"/>
 
-        </LinearLayout>
+                <include
+                    android:id="@+id/movie_details_body"
+                    layout="@layout/activity_movie_details_body"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".50"/>
+
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 </layout>
