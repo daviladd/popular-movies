@@ -1,25 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
+    tools:context=".MainActivity">
+    -->
+
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
+    <!-- Progress bar that will be shown to users to indicate content is being loaded -->
 
     <!-- RecyclerView that will hold and display the movie thumbnails -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview_movies"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipToPadding="true"/>
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <!-- Progress bar that will be shown to users to indicate content is being loaded -->
     <ProgressBar
         android:id="@+id/pb_loading_indicator"
         android:layout_width="@dimen/loading_indicator_square_size"
         android:layout_height="@dimen/loading_indicator_square_size"
         android:layout_gravity="center"
-        android:visibility="invisible" />
-
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+</android.support.constraint.ConstraintLayout>
+<!--
 </LinearLayout>
+-->

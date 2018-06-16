@@ -1,7 +1,5 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies;
 
-import android.content.res.Resources;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,12 +10,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.PopularMoviesAdapter;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
+import com.udacity.androiddeveloper.daviladd.popularmovies.utilities.NetworkUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +27,16 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+
 public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
 
     private final String MOVIE_LIST_KEY = "movie_list";
+
+    private final int SORT_METHOD_POPULARITY = 0;
+    private final int SORT_METHOD_USER_RATING = 1;
+
+    private final int SORT_METHOD_DEFAULT = SORT_METHOD_POPULARITY;
 
     private PopularMoviesAdapter mPopularMoviesAdapter;
     private RecyclerView mRecyclerView;
@@ -67,87 +73,21 @@ public class MainActivity extends AppCompatActivity {
         mPopularMoviesAdapter = new PopularMoviesAdapter(this, createFakeMovies(20));
         mRecyclerView.setAdapter(mPopularMoviesAdapter);
 
-        loadindIndicatorShow();
+        loadingIndicatorShow();
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(MOVIE_LIST_KEY)) {
                 Log.d(TAG, "A movie list was found in the savedInstanceState");
                 mMovieList = savedInstanceState.getParcelable(MOVIE_LIST_KEY);
-                loadindIndicatorHide();
+                loadingIndicatorHide();
                 mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
             }
         } else {
             // TODO: store the sorting method as a setting, so when the app is started, the user
             //      gets the same sorting method as when app was closed/destroyed.
-            getMoviesByPopularity();
+            callMovieAPI(SORT_METHOD_DEFAULT);
         }
 
-    }
-
-    private void getMoviesByPopularity(){
-        loadindIndicatorShow();
-        Log.d(TAG, "Trying to retrieve movies by Popularity");
-        Retrofit retrofit = TMDBRetrofitClient.getClient();
-
-        TMDBRetrofitService apiServiceTmdb = retrofit.create(TMDBRetrofitService.class);
-        String apiKey = getString(R.string.API_KEY_TMDB);
-
-        Call<MovieList> call = apiServiceTmdb
-                .getMoviesByPopularity(apiKey);
-        call.enqueue(new Callback<MovieList>() {
-                    @Override
-                    public void onResponse(retrofit2.Call<MovieList> call, Response<MovieList> movieListResponse) {
-                        loadindIndicatorHide();
-                        if (movieListResponse.isSuccessful()) {
-                            Log.d(TAG, "List of movies sorted by popularity has been successfully retrieved");
-                            mMovieList = movieListResponse.body();
-                            mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
-                        } else {
-                            Log.d(TAG, "List of movies sorted by popularity could not be retrieved");
-                            int statusCode = movieListResponse.code();
-                            // TODO: handle error on request depending on the status code
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(retrofit2.Call<MovieList> call, Throwable t) {
-                        loadindIndicatorHide();
-                        Log.d(TAG, "Error while loading from TMDB API while trying to retrieve movies by popularity");
-                    }
-                });
-    }
-
-    private void getMoviesByUserRating(){
-        loadindIndicatorShow();
-        Log.d(TAG, "Trying to retrieve movies by Rating");
-        Retrofit retrofit = TMDBRetrofitClient.getClient();
-
-        TMDBRetrofitService apiServiceTmdb = retrofit.create(TMDBRetrofitService.class);
-        String apiKey = getString(R.string.API_KEY_TMDB);
-
-        Call<MovieList> call = apiServiceTmdb
-                .getMoviesByUserRating(apiKey);
-        call.enqueue(new Callback<MovieList>() {
-            @Override
-            public void onResponse(retrofit2.Call<MovieList> call, Response<MovieList> movieListResponse) {
-                loadindIndicatorHide();
-                if (movieListResponse.isSuccessful()) {
-                    Log.d(TAG, "List of movies sorted by user rating has been successfully retrieved");
-                    mMovieList = movieListResponse.body();
-                    mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
-                } else {
-                    Log.d(TAG, "List of movies sorted by user rating could not be retrieved");
-                    int statusCode = movieListResponse.code();
-                    // TODO: handle error on request depending on the status code
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<MovieList> call, Throwable t) {
-                loadindIndicatorHide();
-                Log.d(TAG, "Error while loading from TMDB API while trying to retrieve movies by user rating");
-            }
-        });
     }
 
     @Override
@@ -159,15 +99,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
         // Handle item selection
-        switch (item.getItemId()) {
+        switch (itemId) {
             case R.id.menu_sort_method_popularity:
-                Log.d(TAG, getString(R.string.debug_menu_sort_method_popularity));
-                getMoviesByPopularity();
+                callMovieAPI(SORT_METHOD_POPULARITY);
                 return true;
             case R.id.menu_sort_method_rating:
-                Log.d(TAG, getString(R.string.debug_menu_sort_method_rating));
-                getMoviesByUserRating();
+                callMovieAPI(SORT_METHOD_USER_RATING);
                 return true;
             default:
                 Log.d(TAG, "Unknown menu option selected");
@@ -175,23 +114,113 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void loadindIndicatorShow() {
-        Log.d(TAG, "Showing loading indicator");
+    /**
+     * Calls the REST API to get data from the server
+     *
+     * @param callType Type of the call to be done
+     */
+    private void callMovieAPI(int callType) {
+        loadingIndicatorShow();
+        // First check if the device is connected to the internet
+        if (!NetworkUtilities.isDeviceConnectedToInternet(this)){
+            // TODO: substitute the Toast with a Snackbar maybe?
+            Toast.makeText(this,
+                    getString(R.string.device_not_connected),
+                    Toast.LENGTH_LONG).show();
+        } else {
+            switch (callType) {
+                case SORT_METHOD_POPULARITY:
+                    Log.d(TAG, getString(R.string.debug_menu_sort_method_popularity));
+                    getSortedMovieList(SORT_METHOD_POPULARITY);
+                    break;
+                case SORT_METHOD_USER_RATING:
+                    Log.d(TAG, getString(R.string.debug_menu_sort_method_rating));
+                    getSortedMovieList(SORT_METHOD_USER_RATING);
+                    break;
+                default:
+                    Log.d(TAG, getString(R.string.debug_menu_sort_method_unknown));
+                    break;
+            }
+        }
+
+        return;
+    }
+
+    /**
+     * Calls the suitable Retrofit method to get a sorted MovieList depending on the
+     * sorting method selected by the user.
+     *
+     * @param sortingMethod Sorting method selected by the user
+     */
+    private void getSortedMovieList(int sortingMethod) {
+        Log.d(TAG, "Trying to retrieve movies by Rating");
+
+        String apiKey = getString(R.string.API_KEY_TMDB);
+        Retrofit retrofit = TMDBRetrofitClient.getClient();
+        TMDBRetrofitService apiServiceTmdb = retrofit.create(TMDBRetrofitService.class);
+        Call<MovieList> call;
+
+        switch (sortingMethod) {
+            default:
+            case SORT_METHOD_POPULARITY:
+                call = apiServiceTmdb.getMoviesByPopularity(apiKey);
+                break;
+            case SORT_METHOD_USER_RATING:
+                call = apiServiceTmdb.getMoviesByUserRating(apiKey);
+                break;
+        }
+        call.enqueue(new MovieListCallback());
+    }
+
+    /**
+     * Hides the loading indicator
+     */
+    private void loadingIndicatorHide() {
+        Log.d(TAG, getString(R.string.loading_indicator_hide));
+        // Hide the loading indicator:
+        mLoadingIndicator.setVisibility(View.GONE);
+        // Show the movie items view:
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Shows the loading indicator
+     */
+    private void loadingIndicatorShow() {
+        Log.d(TAG, getString(R.string.loading_indicator_show));
         // Hide the movie items view:
-        mRecyclerView.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
         // Show the loading indicator:
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Hides the loading indicator in order to show the
-     */
-    private void loadindIndicatorHide() {
-        Log.d(TAG, "Hiding loading indicator");
-        // Hide the loading indicator:
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
-        // Show the movie items view:
-        mRecyclerView.setVisibility(View.VISIBLE);
+    private class MovieListCallback implements Callback<MovieList> {
+        @Override
+        public void onResponse(retrofit2.Call<MovieList> call, Response<MovieList> movieListResponse) {
+            loadingIndicatorHide();
+            if (movieListResponse.isSuccessful()) {
+                Log.d(TAG, getString(R.string.mlc_onresponse_successful));
+                mMovieList = movieListResponse.body();
+                mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
+            } else {
+                Log.d(TAG, getString(R.string.mlc_onresponse_failure));
+                int statusCode = movieListResponse.code();
+                // TODO: handle error on request depending on the status code
+                Log.e(TAG, movieListResponse.message());
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.mlc_onresponse_failure),
+                        Toast.LENGTH_LONG);
+            }
+        }
+
+        @Override
+        public void onFailure(retrofit2.Call<MovieList> call, Throwable t) {
+            loadingIndicatorHide();
+            Log.d(TAG, getString(R.string.mlc_onfailure));
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.mlc_onfailure),
+                    Toast.LENGTH_LONG);
+        }
     }
 
     List<Movie> createFakeMovies(int quantity) {

@@ -10,9 +10,23 @@
     <string name="movie_details_release_year_label">Release Year</string>
     <string name="movie_details_synopsis_label">Synopsis</string>
 
+    <!-- Loading indicator -->
+    <string name="loading_indicator_show">Showing loading indicator</string>
+    <string name="loading_indicator_hide">Hiding loading indicator</string>
+
+    <!-- Errors -->
+    <string name="device_not_connected">Device is not connected to the Internet</string>
+
+    <!-- MovieListCallback - mlc -->
+    <string name="mlc_onresponse_successful">List of movies has been successfully retrieved</string>
+    <string name="mlc_onresponse_failure">"List of movies could not be retrieved"</string>
+    <string name="mlc_onfailure">Error while loading from TMDB API while trying to retrieve requested movie list</string>
+
     <!-- Debug strings -->
     <string name="debug_menu_sort_method_popularity">User selected sorting the movies by popularity</string>
     <string name="debug_menu_sort_method_rating">User selected sorting the movies by rating</string>
+    <string name="debug_menu_sort_method_unknown">Sorting method selected is not yet implemented</string>
+
     <string name="debug_movie_details_title">This is a very long movie title</string>
     <string name="debug_movie_details_release_year">1999</string>
     <string name="debug_movie_details_synopsis_text">A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy. Their concept catches on, with underground \"fight clubs\" forming in every town, until an eccentric gets in the way and ignites an out-of-control spiral toward oblivion.</string>
