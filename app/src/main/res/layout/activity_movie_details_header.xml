@@ -8,93 +8,58 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/movie_details_general_padding">
 
-        <!-- Vertical line to divide the View in two parts vertically -->
-
+        <!-- ImageView to show the movie poster -->
         <ImageView
             android:id="@+id/movie_details_poster_thumbnail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:adjustViewBounds="true"
+            style="@style/movie_detail_image_thumbnail"
             app:layout_constraintEnd_toStartOf="@+id/movie_details_horizontal_middle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@android:drawable/ic_menu_report_image"/>
 
+        <!-- Vertical line to divide the View in two parts vertically -->
         <android.support.constraint.Guideline
             android:id="@+id/movie_details_horizontal_middle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5"
-            />
+            style="@style/invisible_guideline"
+            app:layout_constraintGuide_percent="0.5"/>
 
+        <!-- Release date label -->
         <TextView
             android:id="@+id/movie_details_release_year_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:fontFamily="sans-serif"
+            style="@style/movie_detail_text_label"
             android:text="@string/movie_details_release_year_label"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@+id/movie_details_horizontal_middle"
             app:layout_constraintTop_toTopOf="@+id/movie_details_poster_thumbnail"/>
 
-        <!-- TextView with the original title of the movie -->
-
-        <!-- TextView with the release date -->
+        <!-- Movie's release date -->
         <TextView
             android:id="@+id/movie_details_release_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:fontFamily="sans-serif"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textSize="16sp"
+            style="@style/movie_detail_text_value"
             app:layout_constraintStart_toStartOf="@+id/movie_details_horizontal_middle"
             app:layout_constraintTop_toBottomOf="@+id/movie_details_release_year_label"
             tools:text="@string/debug_movie_details_release_year"/>
 
-        <!-- ImageView with the movie poster image thumbnail -->
-        <!-- TextView with the user rating -->
+        <!-- User rating label -->
         <TextView
             android:id="@+id/movie_details_user_rating_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:fontFamily="sans-serif"
+            style="@style/movie_detail_text_label"
             android:text="@string/movie_details_user_rating_label"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@+id/movie_details_horizontal_middle"
             app:layout_constraintTop_toBottomOf="@+id/movie_details_release_date"/>
 
+        <!-- Movie's user rating -->
         <TextView
             android:id="@+id/movie_details_user_rating_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:fontFamily="sans-serif"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textSize="16sp"
+            style="@style/movie_detail_text_value"
             app:layout_constraintStart_toStartOf="@+id/movie_details_horizontal_middle"
             app:layout_constraintTop_toBottomOf="@+id/movie_details_user_rating_label"
             tools:text="@string/debug_movie_details_user_rating"/>
 
+        <!-- Movie's user rating over 10 -->
         <TextView
             android:id="@+id/movie_details_user_rating_over_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
+            style="@style/movie_detail_text_label"
             android:text="@string/movie_details_user_rating_over_label"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textSize="12sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/movie_details_user_rating_value"
             app:layout_constraintStart_toEndOf="@+id/movie_details_user_rating_value"/>
 

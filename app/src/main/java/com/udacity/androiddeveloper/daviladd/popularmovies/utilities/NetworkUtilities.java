@@ -5,25 +5,32 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import com.udacity.androiddeveloper.daviladd.popularmovies.R;
+
 public class NetworkUtilities {
     private static final String TAG = NetworkUtilities.class.getSimpleName();
 
+    /**
+     * Checks if the device is connected to the internet
+     *
+     * @param context
+     * @return true if connected, false otherwise
+     */
     public static boolean isDeviceConnectedToInternet(Context context) {
 
         ConnectivityManager connectivityManager =
-                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         boolean isDeviceConnected = networkInfo != null &&
                 networkInfo.isConnectedOrConnecting();
 
         if (isDeviceConnected) {
-            Log.d(TAG, "Device is connected to Internet");
+            Log.d(TAG, context.getString(R.string.device_connected));
         } else {
-            Log.e(TAG, "Device is not connected to Internet");
+            Log.d(TAG, context.getString(R.string.device_not_connected));
         }
 
         return isDeviceConnected;
     }
-
 }

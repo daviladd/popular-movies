@@ -1,7 +1,7 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,19 +13,16 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.PopularMoviesAdapter;
-import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
-import com.udacity.androiddeveloper.daviladd.popularmovies.utilities.NetworkUtilities;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+
+import static com.udacity.androiddeveloper.daviladd.popularmovies.utilities.NetworkUtilities.isDeviceConnectedToInternet;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -33,13 +30,15 @@ public class MainActivity extends AppCompatActivity {
 
     private final String MOVIE_LIST_KEY = "movie_list";
 
+    private final int DEFAULT_COLUMNS_NUMBER = 2;
+
     private final int SORT_METHOD_POPULARITY = 0;
     private final int SORT_METHOD_USER_RATING = 1;
-
     private final int SORT_METHOD_DEFAULT = SORT_METHOD_POPULARITY;
 
-    private PopularMoviesAdapter mPopularMoviesAdapter;
     private RecyclerView mRecyclerView;
+    private PopularMoviesAdapter mPopularMoviesAdapter;
+    private ProgressBar mLoadingIndicator;
 
     private MovieList mMovieList;
 
@@ -51,9 +50,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private ProgressBar mLoadingIndicator;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,18 +58,20 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = findViewById(R.id.recyclerview_movies);
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
+        // TODO: the number of columns and the size of the movies' posters, should be adaptable
+        //  to the device's screen characteristics
         // Create a layout manager to handle the item views on the RecyclerView:
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, DEFAULT_COLUMNS_NUMBER);
 
         //  Associate the layout manager with the RecyclerView:
         mRecyclerView.setLayoutManager(layoutManager);
         // TODO: check if this can be left this way:
         mRecyclerView.setHasFixedSize(true);
 
-        mPopularMoviesAdapter = new PopularMoviesAdapter(this, createFakeMovies(20));
-        mRecyclerView.setAdapter(mPopularMoviesAdapter);
-
         loadingIndicatorShow();
+
+        mPopularMoviesAdapter = new PopularMoviesAdapter(this, null);
+        mRecyclerView.setAdapter(mPopularMoviesAdapter);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(MOVIE_LIST_KEY)) {
@@ -87,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
             //      gets the same sorting method as when app was closed/destroyed.
             callMovieAPI(SORT_METHOD_DEFAULT);
         }
-
     }
 
     @Override
@@ -122,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
     private void callMovieAPI(int callType) {
         loadingIndicatorShow();
         // First check if the device is connected to the internet
-        if (!NetworkUtilities.isDeviceConnectedToInternet(this)){
+        if (!isDeviceConnectedToInternet(this)) {
             // TODO: substitute the Toast with a Snackbar maybe?
             Toast.makeText(this,
                     getString(R.string.device_not_connected),
@@ -158,8 +155,8 @@ public class MainActivity extends AppCompatActivity {
         String apiKey = getString(R.string.API_KEY_TMDB);
         Retrofit retrofit = TMDBRetrofitClient.getClient();
         TMDBRetrofitService apiServiceTmdb = retrofit.create(TMDBRetrofitService.class);
-        Call<MovieList> call;
 
+        Call<MovieList> call;
         switch (sortingMethod) {
             default:
             case SORT_METHOD_POPULARITY:
@@ -201,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
             if (movieListResponse.isSuccessful()) {
                 Log.d(TAG, getString(R.string.mlc_onresponse_successful));
                 mMovieList = movieListResponse.body();
+                // Notify the adapter that we have new data and the activity needs to be updated:
                 mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
             } else {
                 Log.d(TAG, getString(R.string.mlc_onresponse_failure));
@@ -221,17 +219,5 @@ public class MainActivity extends AppCompatActivity {
                     getString(R.string.mlc_onfailure),
                     Toast.LENGTH_LONG);
         }
-    }
-
-    List<Movie> createFakeMovies(int quantity) {
-        List<Movie> movies = new ArrayList<>();
-
-        for (int i = 0; i < quantity; i++) {
-            Movie movie = new Movie();
-            movie.setTitle("Movie " + i);
-            movies.add(movie);
-        }
-
-        return movies;
     }
 }

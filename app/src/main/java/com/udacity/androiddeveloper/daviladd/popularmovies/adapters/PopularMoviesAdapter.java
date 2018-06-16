@@ -14,6 +14,7 @@ import com.squareup.picasso.Picasso;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.ui.detail.MovieDetailActivity;
+import com.udacity.androiddeveloper.daviladd.popularmovies.utilities.PopularMoviesUtilities;
 
 import java.util.List;
 
@@ -22,18 +23,15 @@ public class PopularMoviesAdapter
     // Tag for logger:
     private static final String TAG = PopularMoviesAdapter.class.getSimpleName();
 
-
     private static final int VIEW_TYPE_POSTER_THUMBNAIL_GRID = 0;
 
     private Context mContext;
-
     private static List<Movie> mMovies;
 
     public PopularMoviesAdapter(@NonNull Context context, List<Movie> movies) {
         mContext = context;
         mMovies = movies;
     }
-
 
     @Override
     public int getItemCount() {
@@ -60,11 +58,15 @@ public class PopularMoviesAdapter
 
     @Override
     public void onBindViewHolder(PopularMoviesViewHolder holder, int position) {
+        // Show movie title:
         holder.movieOriginalTitle.setText(mMovies.get(position).getTitle());
-        //holder.moviePosterThumbnail.setImageResource(android.R.drawable.ic_menu_report_image);
-        String thumbnailPath = "http://image.tmdb.org/t/p/w500" + mMovies.get(position).getPosterPath();
+        // Show movie poster image:
+        String thumbnailPath
+                = PopularMoviesUtilities.TMDB_API_THUMBNAIL_PATH
+                + mMovies.get(position).getPosterPath();
         Picasso.get().load(thumbnailPath).into(holder.moviePosterThumbnail);
     }
+
 
     public void updateAnswers(List<Movie> movies) {
         mMovies = movies;
@@ -90,9 +92,13 @@ public class PopularMoviesAdapter
         public void onClick(View view) {
             Context context = view.getContext();
             int position = this.getAdapterPosition();
+            // Create the intent to launch the activity to show this movie's details:
             Intent movieDetailIntent = new Intent(context, MovieDetailActivity.class);
+            // Retrieve the movie from this view's position in the adapter:
             Movie movie = mMovies.get(position);
-            movieDetailIntent.putExtra("MOVIE", movie);
+            // Put the movie (parcel) into the Extra of the intent:
+            movieDetailIntent.putExtra(MovieDetailActivity.PARCELABLE_EXTRA_MOVIE, movie);
+            // Launch the activity to show the movie's details:
             context.startActivity(movieDetailIntent);
         }
     }
