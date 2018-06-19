@@ -1,5 +1,8 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies.data.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -14,16 +17,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+@Entity(tableName = "movie")
 public class Movie implements Parcelable {
 
     private final String TAG = Movie.class.getSimpleName();
 
-    @SerializedName("vote_count")
-    @Expose
-    private Integer voteCount;
+    @PrimaryKey
     @SerializedName("id")
     @Expose
     private Integer id;
+    @SerializedName("vote_count")
+    @Expose
+    private Integer voteCount;
     @SerializedName("video")
     @Expose
     private Boolean video;
@@ -64,6 +69,7 @@ public class Movie implements Parcelable {
     /**
      * No args constructor for use in serialization
      */
+    @Ignore
     public Movie() {
     }
 
@@ -256,6 +262,7 @@ public class Movie implements Parcelable {
         dest.writeString(this.releaseDate);
     }
 
+    @Ignore
     protected Movie(Parcel in) {
         this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());
         this.id = (Integer) in.readValue(Integer.class.getClassLoader());
