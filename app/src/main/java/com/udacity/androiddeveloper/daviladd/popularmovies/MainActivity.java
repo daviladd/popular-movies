@@ -13,10 +13,13 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.PopularMoviesAdapter;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
-import com.udacity.androiddeveloper.daviladd.popularmovies.database.MovieDao;
+import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabase;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -142,6 +145,19 @@ public class MainActivity extends AppCompatActivity {
                 case SORT_METHOD_USER_FAVORITES:
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_user_favorites));
                     // TODO: Retrieve the list from the FavoriteMoviesDatabase
+                    FavoriteMoviesDatabase favoriteMoviesDatabase
+                            = FavoriteMoviesDatabase.getInstance(getApplicationContext());
+                    List<Movie> movieList = favoriteMoviesDatabase.movieDao().getAllFavoriteMovies();
+                    if (movieList != null) {
+                        Log.d(TAG, "The following movies are on the user's favorite list:");
+                        for (Movie movie : movieList) {
+                            Log.d(TAG, movie.getTitle());
+                        }
+                        loadingIndicatorHide();
+                        mPopularMoviesAdapter.updateAnswers(movieList);
+                    } else {
+                        Log.d(TAG, "The user's favorite list is empty");
+                    }
                     break;
                 default:
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_unknown));

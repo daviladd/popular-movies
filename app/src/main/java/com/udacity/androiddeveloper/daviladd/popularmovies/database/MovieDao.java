@@ -23,5 +23,5 @@ public interface MovieDao {
     void updateMovie(Movie movie);
 
     @Delete
-    void deleteMoive(Movie movie);
+    void deleteMovie(Movie movie);
 }

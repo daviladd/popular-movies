@@ -7,15 +7,14 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.ThemedSpinnerAdapter;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
+import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabase;
 import com.udacity.androiddeveloper.daviladd.popularmovies.databinding.ActivityMovieDetailBinding;
 import com.udacity.androiddeveloper.daviladd.popularmovies.utilities.PopularMoviesUtilities;
 
@@ -57,12 +56,18 @@ public class MovieDetailActivity extends AppCompatActivity {
         favoriteButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton favoriteButton, boolean isChecked) {
+                FavoriteMoviesDatabase favoriteMoviesDatabase
+                        = FavoriteMoviesDatabase.getInstance(getApplicationContext());
                 if (isChecked) {
                     Log.d(TAG, "User selected to add this movie to the Favorite Movies DB");
                     // TODO: add this movie to the database
+                    // TODO: before inserting a movie, we need to check if a movie with this one's ID
+                    //  is already in the database, and if so, call update instead!
+                    favoriteMoviesDatabase.movieDao().insertMovie(mMovie);
                 } else {
                     Log.d(TAG, "The user does not want this movie to be in the Favorite Movies DB");
                     // TODO: remove this movie from the database
+                    favoriteMoviesDatabase.movieDao().deleteMovie(mMovie);
                 }
             }
         });
