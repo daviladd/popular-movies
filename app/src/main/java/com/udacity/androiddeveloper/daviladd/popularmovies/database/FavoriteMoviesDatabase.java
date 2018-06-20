@@ -31,10 +31,6 @@ public abstract class FavoriteMoviesDatabase extends RoomDatabase {
                         context.getApplicationContext(),
                         FavoriteMoviesDatabase.class,
                         FavoriteMoviesDatabase.DATABASE_NAME)
-                        // TODO: remove following function call, as the queries should be done
-                        // in a separate thread to a void locking the UI.
-                        // This is just for testing ;)
-                        .allowMainThreadQueries()
                         .build();
             }
         }

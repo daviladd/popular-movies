@@ -18,6 +18,7 @@ import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
 import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabase;
+import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabaseExecutors;
 
 import java.util.List;
 
@@ -147,17 +148,28 @@ public class MainActivity extends AppCompatActivity {
                     // TODO: Retrieve the list from the FavoriteMoviesDatabase
                     FavoriteMoviesDatabase favoriteMoviesDatabase
                             = FavoriteMoviesDatabase.getInstance(getApplicationContext());
-                    List<Movie> movieList = favoriteMoviesDatabase.movieDao().getAllFavoriteMovies();
-                    if (movieList != null) {
-                        Log.d(TAG, "The following movies are on the user's favorite list:");
-                        for (Movie movie : movieList) {
-                            Log.d(TAG, movie.getTitle());
+                    FavoriteMoviesDatabaseExecutors.getsInstance().databaseExecutor().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Movie> movieList = favoriteMoviesDatabase.movieDao().getAllFavoriteMovies();
+                            if (movieList != null) {
+                                Log.d(TAG, "The following movies are on the user's favorite list:");
+                                for (Movie movie : movieList) {
+                                    Log.d(TAG, movie.getTitle());
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        loadingIndicatorHide();
+                                        mPopularMoviesAdapter.updateAnswers(movieList);
+                                    }
+                                });
+                            } else {
+                                Log.d(TAG, "The user's favorite list is empty");
+                            }
                         }
-                        loadingIndicatorHide();
-                        mPopularMoviesAdapter.updateAnswers(movieList);
-                    } else {
-                        Log.d(TAG, "The user's favorite list is empty");
-                    }
+                    });
+
                     break;
                 default:
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_unknown));

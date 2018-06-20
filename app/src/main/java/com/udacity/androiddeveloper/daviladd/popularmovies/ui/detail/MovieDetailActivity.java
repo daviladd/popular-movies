@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabase;
+import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabaseExecutors;
 import com.udacity.androiddeveloper.daviladd.popularmovies.databinding.ActivityMovieDetailBinding;
 import com.udacity.androiddeveloper.daviladd.popularmovies.utilities.PopularMoviesUtilities;
 
@@ -63,11 +64,23 @@ public class MovieDetailActivity extends AppCompatActivity {
                     // TODO: add this movie to the database
                     // TODO: before inserting a movie, we need to check if a movie with this one's ID
                     //  is already in the database, and if so, call update instead!
-                    favoriteMoviesDatabase.movieDao().insertMovie(mMovie);
+                    FavoriteMoviesDatabaseExecutors.getsInstance().databaseExecutor().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            favoriteMoviesDatabase.movieDao().insertMovie(mMovie);
+                        }
+                    });
+                    //favoriteMoviesDatabase.movieDao().insertMovie(mMovie);
                 } else {
                     Log.d(TAG, "The user does not want this movie to be in the Favorite Movies DB");
                     // TODO: remove this movie from the database
-                    favoriteMoviesDatabase.movieDao().deleteMovie(mMovie);
+                    FavoriteMoviesDatabaseExecutors.getsInstance().databaseExecutor().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            favoriteMoviesDatabase.movieDao().deleteMovie(mMovie);
+                        }
+                    });
+                    //favoriteMoviesDatabase.movieDao().deleteMovie(mMovie);
                 }
             }
         });
