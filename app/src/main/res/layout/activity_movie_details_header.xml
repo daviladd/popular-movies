@@ -63,5 +63,15 @@
             app:layout_constraintBaseline_toBaselineOf="@+id/movie_details_user_rating_value"
             app:layout_constraintStart_toEndOf="@+id/movie_details_user_rating_value"/>
 
+        <!-- Toggle button to add/remove this movie from the user's favorite list -->
+        <ToggleButton
+            android:id="@+id/favorite_star"
+            style="?android:attr/starStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@+id/movie_details_user_rating_value"
+            app:layout_constraintTop_toBottomOf="@+id/movie_details_user_rating_value"/>
+
     </android.support.constraint.ConstraintLayout>
 </layout>

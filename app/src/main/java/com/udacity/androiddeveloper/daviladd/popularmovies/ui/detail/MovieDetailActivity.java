@@ -7,7 +7,11 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.ThemedSpinnerAdapter;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
@@ -23,6 +27,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     public final static String PARCELABLE_EXTRA_MOVIE = "MOVIE";
 
     private ActivityMovieDetailBinding mActivityMovieDetail;
+    private Movie mMovie;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,9 +39,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Retrieve the movie instance which details are to be shown in this activity:
-        Movie movie = getIntent().getParcelableExtra(PARCELABLE_EXTRA_MOVIE);
-        if (movie != null) {
-            bindMovieToUI(movie);
+        mMovie = getIntent().getParcelableExtra(PARCELABLE_EXTRA_MOVIE);
+        if (mMovie != null) {
+            bindMovieToUI(mMovie);
         } else {
             // TODO: what to do in this case? Return back immediately to previous activity?
             Log.e(TAG, getString(R.string.movie_details_not_available));
@@ -44,6 +49,23 @@ public class MovieDetailActivity extends AppCompatActivity {
                     getString(R.string.movie_details_not_available),
                     Toast.LENGTH_LONG);
         }
+
+        ToggleButton favoriteButton = findViewById(R.id.favorite_star);
+        favoriteButton.setText(null);
+        favoriteButton.setTextOn(null);
+        favoriteButton.setTextOff(null);
+        favoriteButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton favoriteButton, boolean isChecked) {
+                if (isChecked) {
+                    Log.d(TAG, "User selected to add this movie to the Favorite Movies DB");
+                    // TODO: add this movie to the database
+                } else {
+                    Log.d(TAG, "The user does not want this movie to be in the Favorite Movies DB");
+                    // TODO: remove this movie from the database
+                }
+            }
+        });
     }
 
     @Override
@@ -75,6 +97,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         mActivityMovieDetail.movieDetailsHeader.movieDetailsUserRatingValue
                 .setText(new DecimalFormat(".#").format(movie.getVoteAverage()));
         mActivityMovieDetail.movieDetailsBody.movieDetailsSynopsisValue.setText(movie.getOverview());
+        // TODO: find a method to know if a movie is on the user's favorite movie list or not, to
+        //  display the star toggle button either glowing or off.
 
     }
 }

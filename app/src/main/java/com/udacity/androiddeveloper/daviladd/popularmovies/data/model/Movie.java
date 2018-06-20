@@ -20,6 +20,7 @@ import java.util.List;
 @Entity(tableName = "movie")
 public class Movie implements Parcelable {
 
+    @Ignore
     private final String TAG = Movie.class.getSimpleName();
 
     @PrimaryKey
@@ -50,6 +51,7 @@ public class Movie implements Parcelable {
     @SerializedName("original_title")
     @Expose
     private String originalTitle;
+    @Ignore // TODO: This would need a TypeConverter
     @SerializedName("genre_ids")
     @Expose
     private List<Integer> genreIds = null;
@@ -89,6 +91,7 @@ public class Movie implements Parcelable {
      * @param video
      * @param popularity
      */
+    @Ignore
     public Movie(Integer voteCount, Integer id, Boolean video, Double voteAverage, String title, Double popularity, String posterPath, String originalLanguage, String originalTitle, List<Integer> genreIds, String backdropPath, Boolean adult, String overview, String releaseDate) {
         super();
         this.voteCount = voteCount;
@@ -101,6 +104,41 @@ public class Movie implements Parcelable {
         this.originalLanguage = originalLanguage;
         this.originalTitle = originalTitle;
         this.genreIds = genreIds;
+        this.backdropPath = backdropPath;
+        this.adult = adult;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+    }
+
+    /**
+     * This is the (temporal) Movie constructor used by Room
+     *
+     * @param id
+     * @param title
+     * @param releaseDate
+     * @param overview
+     * @param posterPath
+     * @param originalTitle
+     * @param voteAverage
+     * @param originalLanguage
+     * @param adult
+     * @param backdropPath
+     * @param voteCount
+     * @param video
+     * @param popularity
+     */
+    public Movie(Integer voteCount, Integer id, Boolean video, Double voteAverage, String title, Double popularity, String posterPath, String originalLanguage, String originalTitle, String backdropPath, Boolean adult, String overview, String releaseDate) {
+        super();
+        this.voteCount = voteCount;
+        this.id = id;
+        this.video = video;
+        this.voteAverage = voteAverage;
+        this.title = title;
+        this.popularity = popularity;
+        this.posterPath = posterPath;
+        this.originalLanguage = originalLanguage;
+        this.originalTitle = originalTitle;
+        this.genreIds = null;   // TODO: add a TypeConverter for this member
         this.backdropPath = backdropPath;
         this.adult = adult;
         this.overview = overview;

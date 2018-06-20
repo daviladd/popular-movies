@@ -18,7 +18,7 @@ public abstract class FavoriteMoviesDatabase extends RoomDatabase {
 
     /**
      * Returns an instance of the favorite movies database using the Singleton pattern
-     *  to ensure that only one database object of the database class is instantiated.
+     * to ensure that only one database object of the database class is instantiated.
      *
      * @param context
      * @return instance of the database
