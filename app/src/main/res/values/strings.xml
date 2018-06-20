@@ -5,6 +5,7 @@
     <string name="menu_sort_method">Sort Movies by...</string>
     <string name="menu_sort_method_popularity">Sort Movies by Popularity</string>
     <string name="menu_sort_method_rating">Sort Movies by Rating</string>
+    <string name="menu_sort_method_favorite_movies">My Favorite Movies</string>
     <!-- Loading indicator -->
     <string name="loading_indicator_show">Showing loading indicator</string>
     <string name="loading_indicator_hide">Hiding loading indicator</string>
@@ -15,6 +16,7 @@
     <!-- Debug strings -->
     <string name="debug_menu_sort_method_popularity">User selected sorting the movies by popularity</string>
     <string name="debug_menu_sort_method_rating">User selected sorting the movies by rating</string>
+    <string name="debug_menu_sort_method_user_favorites">User selected to see the favorite movie list</string>
     <string name="debug_menu_sort_method_unknown">Sorting method selected is not yet implemented</string>
 
     <!-- Movie details activity -->

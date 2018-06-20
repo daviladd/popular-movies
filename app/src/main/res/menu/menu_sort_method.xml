@@ -13,6 +13,8 @@
                   android:title="@string/menu_sort_method_rating" />
             <item android:id="@+id/menu_sort_method_popularity"
                   android:title="@string/menu_sort_method_popularity" />
+            <item android:id="@+id/menu_sort_method_favorite_movies"
+                  android:title="@string/menu_sort_method_popularity" />
         </menu>
     </item>
 </menu>

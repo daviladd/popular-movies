@@ -16,6 +16,7 @@ import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.PopularMovie
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
+import com.udacity.androiddeveloper.daviladd.popularmovies.database.MovieDao;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final int SORT_METHOD_POPULARITY = 0;
     private final int SORT_METHOD_USER_RATING = 1;
+    private final int SORT_METHOD_USER_FAVORITES = 2;
     private final int SORT_METHOD_DEFAULT = SORT_METHOD_POPULARITY;
 
     private RecyclerView mRecyclerView;
@@ -105,6 +107,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_sort_method_rating:
                 callMovieAPI(SORT_METHOD_USER_RATING);
                 return true;
+            case R.id.menu_sort_method_favorite_movies:
+                callMovieAPI(SORT_METHOD_USER_FAVORITES);
+                return true;
             default:
                 Log.d(TAG, "Unknown menu option selected");
                 return super.onOptionsItemSelected(item);
@@ -133,6 +138,10 @@ public class MainActivity extends AppCompatActivity {
                 case SORT_METHOD_USER_RATING:
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_rating));
                     getSortedMovieList(SORT_METHOD_USER_RATING);
+                    break;
+                case SORT_METHOD_USER_FAVORITES:
+                    Log.d(TAG, getString(R.string.debug_menu_sort_method_user_favorites));
+                    // TODO: Retrieve the list from the FavoriteMoviesDatabase
                     break;
                 default:
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_unknown));
