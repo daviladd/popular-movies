@@ -63,22 +63,6 @@ public class MainActivity extends AppCompatActivity {
         outState.putInt(SORT_METHOD_KEY, mSortMethod);
     }
 
-    /*
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (mMovieList != null) {
-            Log.d(TAG, "onResume: A movie list was found in the savedInstanceState");
-            if (mSortMethod == SORT_METHOD_USER_FAVORITES) {
-                callMovieAPI(SORT_METHOD_USER_FAVORITES);
-            }
-            mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
-        } else {
-            callMovieAPI(SORT_METHOD_DEFAULT);
-        }
-    }
-    */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,15 +168,20 @@ public class MainActivity extends AppCompatActivity {
                     movieList.observe(this, new Observer<List<Movie>>() {
                         @Override
                         public void onChanged(@Nullable List<Movie> movies) {
+                            Log.d(TAG, "LiveData: Favorite movies list has changed!");
                             loadingIndicatorHide();
+                            if (mSortMethod != SORT_METHOD_USER_FAVORITES){
+                                Log.d(TAG, "LiveData: Sorting method is not user favorites");
+                                return;
+                            }
                             if (movies != null) {
-                                Log.d(TAG, "The following movies are on the user's favorite list:");
+                                Log.d(TAG, "LiveData: The following movies are on the user's favorite list:");
                                 for (Movie movie : movies) {
                                     Log.d(TAG, movie.getTitle());
                                 }
                                 mPopularMoviesAdapter.updateAnswers(movies);
                             } else {
-                                Log.d(TAG, "The user's favorite list is empty");
+                                Log.d(TAG, "LiveData: The user's favorite list is empty");
                             }
                         }
                     });
