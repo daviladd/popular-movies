@@ -1,6 +1,9 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -60,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         outState.putInt(SORT_METHOD_KEY, mSortMethod);
     }
 
+    /*
     @Override
     protected void onResume() {
         super.onResume();
@@ -74,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             callMovieAPI(SORT_METHOD_DEFAULT);
         }
     }
-
+    */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -174,28 +178,24 @@ public class MainActivity extends AppCompatActivity {
                     // TODO: Retrieve the list from the FavoriteMoviesDatabase
                     FavoriteMoviesDatabase favoriteMoviesDatabase
                             = FavoriteMoviesDatabase.getInstance(getApplicationContext());
-                    FavoriteMoviesDatabaseExecutors.getsInstance().databaseExecutor().execute(new Runnable() {
+
+                    LiveData<List<Movie>> movieList
+                            = favoriteMoviesDatabase.movieDao().getAllFavoriteMovies();
+                    movieList.observe(this, new Observer<List<Movie>>() {
                         @Override
-                        public void run() {
-                            List<Movie> movieList = favoriteMoviesDatabase.movieDao().getAllFavoriteMovies();
-                            if (movieList != null) {
+                        public void onChanged(@Nullable List<Movie> movies) {
+                            loadingIndicatorHide();
+                            if (movies != null) {
                                 Log.d(TAG, "The following movies are on the user's favorite list:");
-                                for (Movie movie : movieList) {
+                                for (Movie movie : movies) {
                                     Log.d(TAG, movie.getTitle());
                                 }
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        loadingIndicatorHide();
-                                        mPopularMoviesAdapter.updateAnswers(movieList);
-                                    }
-                                });
+                                mPopularMoviesAdapter.updateAnswers(movies);
                             } else {
                                 Log.d(TAG, "The user's favorite list is empty");
                             }
                         }
                     });
-
                     break;
                 default:
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_unknown));
