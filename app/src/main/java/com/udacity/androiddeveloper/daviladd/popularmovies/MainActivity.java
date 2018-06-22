@@ -2,6 +2,7 @@ package com.udacity.androiddeveloper.daviladd.popularmovies;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -158,33 +159,8 @@ public class MainActivity extends AppCompatActivity {
                     getSortedMovieList(SORT_METHOD_USER_RATING);
                     break;
                 case SORT_METHOD_USER_FAVORITES:
+                    setupFavoriteMoviesViewModel();
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_user_favorites));
-                    // TODO: Retrieve the list from the FavoriteMoviesDatabase
-                    FavoriteMoviesDatabase favoriteMoviesDatabase
-                            = FavoriteMoviesDatabase.getInstance(getApplicationContext());
-
-                    LiveData<List<Movie>> movieList
-                            = favoriteMoviesDatabase.movieDao().getAllFavoriteMovies();
-                    movieList.observe(this, new Observer<List<Movie>>() {
-                        @Override
-                        public void onChanged(@Nullable List<Movie> movies) {
-                            Log.d(TAG, "LiveData: Favorite movies list has changed!");
-                            loadingIndicatorHide();
-                            if (mSortMethod != SORT_METHOD_USER_FAVORITES){
-                                Log.d(TAG, "LiveData: Sorting method is not user favorites");
-                                return;
-                            }
-                            if (movies != null) {
-                                Log.d(TAG, "LiveData: The following movies are on the user's favorite list:");
-                                for (Movie movie : movies) {
-                                    Log.d(TAG, movie.getTitle());
-                                }
-                                mPopularMoviesAdapter.updateAnswers(movies);
-                            } else {
-                                Log.d(TAG, "LiveData: The user's favorite list is empty");
-                            }
-                        }
-                    });
                     break;
                 default:
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_unknown));
@@ -193,6 +169,32 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return;
+    }
+
+    private void setupFavoriteMoviesViewModel() {
+        // Favorite Movies list:
+        MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mainViewModel.getFavoriteMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                Log.d(TAG, "Updating the favorite movies list from the LiveData in ViewModel");
+                loadingIndicatorHide();
+                if (mSortMethod != SORT_METHOD_USER_FAVORITES){
+                    mainViewModel.getFavoriteMovies().removeObserver(this);
+                    Log.d(TAG, "Sorting method is not user favorites");
+                    return;
+                }
+                if (movies != null) {
+                    Log.d(TAG, "The following movies are now on the user's favorite list:");
+                    for (Movie movie : movies) {
+                        Log.d(TAG, movie.getTitle());
+                    }
+                    mPopularMoviesAdapter.updateAnswers(movies);
+                } else {
+                    Log.d(TAG, "The user's favorite list is empty");
+                }
+            }
+        });
     }
 
     /**
