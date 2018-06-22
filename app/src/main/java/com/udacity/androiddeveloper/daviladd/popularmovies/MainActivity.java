@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
 
     private final String MOVIE_LIST_KEY = "movie_list";
+    private final String SORT_METHOD_KEY = "sort_method";
 
     private final int DEFAULT_COLUMNS_NUMBER = 2;
 
@@ -47,12 +48,30 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar mLoadingIndicator;
 
     private MovieList mMovieList;
+    // TODO: the sorting method should be better saved as a preference!
+    private int mSortMethod;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mMovieList != null) {
             outState.putParcelable(MOVIE_LIST_KEY, mMovieList);
+        }
+        outState.putInt(SORT_METHOD_KEY, mSortMethod);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mMovieList != null) {
+            Log.d(TAG, "onResume: A movie list was found in the savedInstanceState");
+            if (mSortMethod == SORT_METHOD_USER_FAVORITES) {
+                callMovieAPI(SORT_METHOD_USER_FAVORITES);
+            }
+            mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
+        } else {
+            callMovieAPI(SORT_METHOD_DEFAULT);
         }
     }
 
@@ -84,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "A movie list was found in the savedInstanceState");
                 mMovieList = savedInstanceState.getParcelable(MOVIE_LIST_KEY);
                 loadingIndicatorHide();
+                if (savedInstanceState.getInt(SORT_METHOD_KEY) == SORT_METHOD_USER_FAVORITES) {
+                    callMovieAPI(SORT_METHOD_USER_FAVORITES);
+                }
                 mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
             }
         } else {
@@ -106,15 +128,19 @@ public class MainActivity extends AppCompatActivity {
         // Handle item selection
         switch (itemId) {
             case R.id.menu_sort_method_popularity:
+                mSortMethod = SORT_METHOD_POPULARITY;
                 callMovieAPI(SORT_METHOD_POPULARITY);
                 return true;
             case R.id.menu_sort_method_rating:
+                mSortMethod = SORT_METHOD_USER_RATING;
                 callMovieAPI(SORT_METHOD_USER_RATING);
                 return true;
             case R.id.menu_sort_method_favorite_movies:
+                mSortMethod = SORT_METHOD_USER_FAVORITES;
                 callMovieAPI(SORT_METHOD_USER_FAVORITES);
                 return true;
             default:
+                mSortMethod = SORT_METHOD_DEFAULT;
                 Log.d(TAG, "Unknown menu option selected");
                 return super.onOptionsItemSelected(item);
         }

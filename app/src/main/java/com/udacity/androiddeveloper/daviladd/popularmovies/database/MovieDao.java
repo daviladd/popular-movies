@@ -27,4 +27,7 @@ public interface MovieDao {
 
     @Query("SELECT * FROM movie WHERE id = :id")
     Movie getMovieById(int id);
+
+    @Query("SELECT id FROM movie WHERE id = :id")
+    Integer isMovieInFavorites(int id);
 }
