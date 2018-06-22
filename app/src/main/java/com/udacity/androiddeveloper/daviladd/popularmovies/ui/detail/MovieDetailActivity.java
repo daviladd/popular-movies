@@ -1,5 +1,7 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies.ui.detail;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -94,24 +96,19 @@ public class MovieDetailActivity extends AppCompatActivity {
     private void isMovieInFavorites(int movieId) {
         FavoriteMoviesDatabase favoriteMoviesDatabase
                 = FavoriteMoviesDatabase.getInstance(getApplicationContext());
-        FavoriteMoviesDatabaseExecutors.getsInstance().databaseExecutor().execute(new Runnable() {
+        LiveData<Integer> dbMovieId = favoriteMoviesDatabase.movieDao().isMovieInFavorites(movieId);
+        dbMovieId.observe(this, new Observer<Integer>() {
             @Override
-            public void run() {
-                Integer dbMovieId = favoriteMoviesDatabase.movieDao().isMovieInFavorites(movieId);
-                Log.d(TAG, "daoMovieId = " + dbMovieId);
-                if (dbMovieId != null) {
+            public void onChanged(@Nullable Integer movieId) {
+                Log.d(TAG, "movieId = " + movieId);
+                if (movieId != null) {
                     Log.d(TAG, "Movie is in the favorites list");
                     mIsFavorite = true;
                 } else {
                     Log.d(TAG, "Movie is in not the favorites list");
                     mIsFavorite = false;
                 }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        bindMovieToUI(mMovie);
-                    }
-                });
+                bindMovieToUI(mMovie);
             }
         });
     }
