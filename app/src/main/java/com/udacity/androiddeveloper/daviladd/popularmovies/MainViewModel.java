@@ -4,7 +4,6 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.util.Log;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;

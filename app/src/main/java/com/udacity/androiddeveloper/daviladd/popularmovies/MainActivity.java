@@ -1,6 +1,5 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -21,8 +20,6 @@ import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
-import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabase;
-import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabaseExecutors;
 
 import java.util.List;
 
@@ -129,8 +126,6 @@ public class MainActivity extends AppCompatActivity {
                 callMovieAPI(SORT_METHOD_USER_FAVORITES);
                 return true;
             default:
-                mSortMethod = SORT_METHOD_DEFAULT;
-                Log.d(TAG, "Unknown menu option selected");
                 return super.onOptionsItemSelected(item);
         }
     }
@@ -179,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<Movie> movies) {
                 Log.d(TAG, "Updating the favorite movies list from the LiveData in ViewModel");
                 loadingIndicatorHide();
-                if (mSortMethod != SORT_METHOD_USER_FAVORITES){
+                if (mSortMethod != SORT_METHOD_USER_FAVORITES) {
                     mainViewModel.getFavoriteMovies().removeObserver(this);
                     Log.d(TAG, "Sorting method is not user favorites");
                     return;

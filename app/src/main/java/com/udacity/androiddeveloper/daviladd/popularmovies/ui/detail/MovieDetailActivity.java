@@ -2,6 +2,7 @@ package com.udacity.androiddeveloper.daviladd.popularmovies.ui.detail;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,8 +29,8 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     public final static String PARCELABLE_EXTRA_MOVIE = "MOVIE";
 
+    private MovieDetailViewModel mMovieDetailViewModel;
     private ActivityMovieDetailBinding mActivityMovieDetail;
-    private Movie mMovie;
 
     private boolean mIsFavorite;
 
@@ -37,22 +38,34 @@ public class MovieDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mActivityMovieDetail = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
-
         // To add the "up" navigation button:
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Set the UI binding:
+        mActivityMovieDetail
+                = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
+
+        // Set the ViewModel:
+        mMovieDetailViewModel
+                = ViewModelProviders.of(this).get(MovieDetailViewModel.class);
+        // and observe the LiveData:
+        mMovieDetailViewModel.getMovie().observe(this, movie -> {
+            if (movie != null) bindMovieToUI(movie);
+        });
+
+
         // Retrieve the movie instance which details are to be shown in this activity:
-        mMovie = getIntent().getParcelableExtra(PARCELABLE_EXTRA_MOVIE);
-        if (mMovie == null) {
+        Movie movie = getIntent().getParcelableExtra(PARCELABLE_EXTRA_MOVIE);
+        if (movie == null) {
             // TODO: what to do in this case? Return back immediately to previous activity?
             Log.e(TAG, getString(R.string.movie_details_not_available));
             Toast.makeText(getApplicationContext(),
                     getString(R.string.movie_details_not_available),
                     Toast.LENGTH_LONG);
+            finish();
         } else {
-            Log.d(TAG, "Opening detailed view for " + mMovie.getTitle());
-            isMovieInFavorites(mMovie.getId());
+            Log.d(TAG, "Opening detailed view for " + movie.getTitle());
+            isMovieInFavorites(movie);
         }
     }
 
@@ -93,10 +106,10 @@ public class MovieDetailActivity extends AppCompatActivity {
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setOnCheckedChangeListener(new favoriteButtonOnCheckedChangedListener());
     }
 
-    private void isMovieInFavorites(int movieId) {
+    private void isMovieInFavorites(Movie movie) {
         FavoriteMoviesDatabase favoriteMoviesDatabase
                 = FavoriteMoviesDatabase.getInstance(getApplicationContext());
-        LiveData<Integer> dbMovieId = favoriteMoviesDatabase.movieDao().isMovieInFavorites(movieId);
+        LiveData<Integer> dbMovieId = favoriteMoviesDatabase.movieDao().isMovieInFavorites(movie.getId());
         dbMovieId.observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable Integer movieId) {
@@ -108,7 +121,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                     Log.d(TAG, "Movie is in not the favorites list");
                     mIsFavorite = false;
                 }
-                bindMovieToUI(mMovie);
+                mMovieDetailViewModel.setMovie(movie);
             }
         });
     }
@@ -120,31 +133,35 @@ public class MovieDetailActivity extends AppCompatActivity {
             FavoriteMoviesDatabase favoriteMoviesDatabase
                     = FavoriteMoviesDatabase.getInstance(getApplicationContext());
             if (isChecked) {
-                // TODO: add this movie to the database
-                // TODO: before inserting a movie, we need to check if a movie with this one's ID
-                //  is already in the database, and if so, call update instead!
+                // Add the movie to the favorite movies DB:
                 if (mIsFavorite) {
-                    Log.d(TAG, "User selected to add this movie to the Favorite Movies DB, but it already is");
-                    return;
+                    // It is already in the DB. Right now this situation is impossible to happen
+                    //  but who knows in the future...
+                    // Update the entry:
+                    Log.d(TAG, "Updating movie entry in the Favorite Movies DB");
+                    favoriteMoviesDatabase.movieDao()
+                            .updateMovie(mMovieDetailViewModel.getMovie().getValue());
+                } else {
+                    // Add the movie to favorites:
+                    FavoriteMoviesDatabaseExecutors.getsInstance().databaseExecutor().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "Adding movie to the Favorite Movies DB");
+                            favoriteMoviesDatabase.movieDao()
+                                    .insertMovie(mMovieDetailViewModel.getMovie().getValue());
+                        }
+                    });
                 }
-                FavoriteMoviesDatabaseExecutors.getsInstance().databaseExecutor().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d(TAG, "User selected to add this movie to the Favorite Movies DB");
-                        favoriteMoviesDatabase.movieDao().insertMovie(mMovie);
-                    }
-                });
-                //favoriteMoviesDatabase.movieDao().insertMovie(mMovie);
             } else {
-                Log.d(TAG, "The user does not want this movie to be in the Favorite Movies DB");
-                // TODO: remove this movie from the database
+                // Remove the movie from favorites:
+                Log.d(TAG, "Removing movie from the Favorite Movies DB");
                 FavoriteMoviesDatabaseExecutors.getsInstance().databaseExecutor().execute(new Runnable() {
                     @Override
                     public void run() {
-                        favoriteMoviesDatabase.movieDao().deleteMovie(mMovie);
+                        favoriteMoviesDatabase.movieDao()
+                                .deleteMovie(mMovieDetailViewModel.getMovie().getValue());
                     }
                 });
-                //favoriteMoviesDatabase.movieDao().deleteMovie(mMovie);
             }
         }
     }
