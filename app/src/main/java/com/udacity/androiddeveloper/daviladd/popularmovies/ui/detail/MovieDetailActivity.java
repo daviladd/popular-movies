@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
@@ -25,10 +24,8 @@ import com.udacity.androiddeveloper.daviladd.popularmovies.utilities.PopularMovi
 import java.text.DecimalFormat;
 
 public class MovieDetailActivity extends AppCompatActivity {
-    private static final String TAG = MovieDetailActivity.class.getSimpleName();
-
     public final static String PARCELABLE_EXTRA_MOVIE = "MOVIE";
-
+    private static final String TAG = MovieDetailActivity.class.getSimpleName();
     private MovieDetailViewModel mMovieDetailViewModel;
     private ActivityMovieDetailBinding mActivityMovieDetail;
 
@@ -44,7 +41,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         // Set the UI binding:
         mActivityMovieDetail
                 = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
-
         // Set the ViewModel:
         mMovieDetailViewModel
                 = ViewModelProviders.of(this).get(MovieDetailViewModel.class);

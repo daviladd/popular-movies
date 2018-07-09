@@ -2,17 +2,16 @@ package com.udacity.androiddeveloper.daviladd.popularmovies;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.PopularMoviesAdapter;
@@ -20,6 +19,7 @@ import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
+import com.udacity.androiddeveloper.daviladd.popularmovies.databinding.ActivityMainBinding;
 
 import java.util.List;
 
@@ -44,13 +44,14 @@ public class MainActivity extends AppCompatActivity {
     private final int SORT_METHOD_USER_FAVORITES = 2;
     private final int SORT_METHOD_DEFAULT = SORT_METHOD_POPULARITY;
 
-    private RecyclerView mRecyclerView;
     private PopularMoviesAdapter mPopularMoviesAdapter;
-    private ProgressBar mLoadingIndicator;
 
     private MovieList mMovieList;
     // TODO: the sorting method should be better saved as a preference!
     private int mSortMethod;
+
+    // For the data binding:
+    private ActivityMainBinding mActivityMain;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -64,10 +65,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        // Get the RecyclerView and the ProgressBar:
-        mRecyclerView = findViewById(R.id.recyclerview_movies);
-        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
+
+        // Set the UI binding:
+        mActivityMain = DataBindingUtil
+                .setContentView(this, R.layout.activity_main);
 
         // TODO: the number of columns and the size of the movies' posters, should be adaptable
         //  to the device's screen characteristics
@@ -75,14 +76,13 @@ public class MainActivity extends AppCompatActivity {
         GridLayoutManager layoutManager = new GridLayoutManager(this, DEFAULT_COLUMNS_NUMBER);
 
         //  Associate the layout manager with the RecyclerView:
-        mRecyclerView.setLayoutManager(layoutManager);
-        // TODO: check if this can be left this way:
-        mRecyclerView.setHasFixedSize(true);
+        mActivityMain.recyclerviewMovies.setLayoutManager(layoutManager);
+        mActivityMain.recyclerviewMovies.setHasFixedSize(true);
 
         loadingIndicatorShow();
 
         mPopularMoviesAdapter = new PopularMoviesAdapter(this, null);
-        mRecyclerView.setAdapter(mPopularMoviesAdapter);
+        mActivityMain.recyclerviewMovies.setAdapter(mPopularMoviesAdapter);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(MOVIE_LIST_KEY)) {
@@ -147,15 +147,18 @@ public class MainActivity extends AppCompatActivity {
             switch (callType) {
                 case SORT_METHOD_POPULARITY:
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_popularity));
+                    mActivityMain.tvViewMode.setText(R.string.view_mode_popularity);
                     getSortedMovieList(SORT_METHOD_POPULARITY);
                     break;
                 case SORT_METHOD_USER_RATING:
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_rating));
+                    mActivityMain.tvViewMode.setText(R.string.view_mode_rating);
                     getSortedMovieList(SORT_METHOD_USER_RATING);
                     break;
                 case SORT_METHOD_USER_FAVORITES:
-                    setupFavoriteMoviesViewModel();
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_user_favorites));
+                    mActivityMain.tvViewMode.setText(R.string.view_mode_favorite_movies);
+                    setupFavoriteMoviesViewModel();
                     break;
                 default:
                     Log.d(TAG, getString(R.string.debug_menu_sort_method_unknown));
@@ -224,9 +227,9 @@ public class MainActivity extends AppCompatActivity {
     private void loadingIndicatorHide() {
         Log.d(TAG, getString(R.string.loading_indicator_hide));
         // Hide the loading indicator:
-        mLoadingIndicator.setVisibility(View.GONE);
+        mActivityMain.pbLoadingIndicator.setVisibility(View.GONE);
         // Show the movie items view:
-        mRecyclerView.setVisibility(View.VISIBLE);
+        mActivityMain.recyclerviewMovies.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -235,9 +238,9 @@ public class MainActivity extends AppCompatActivity {
     private void loadingIndicatorShow() {
         Log.d(TAG, getString(R.string.loading_indicator_show));
         // Hide the movie items view:
-        mRecyclerView.setVisibility(View.GONE);
+        mActivityMain.recyclerviewMovies.setVisibility(View.GONE);
         // Show the loading indicator:
-        mLoadingIndicator.setVisibility(View.VISIBLE);
+        mActivityMain.pbLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
     private class MovieListCallback implements Callback<MovieList> {

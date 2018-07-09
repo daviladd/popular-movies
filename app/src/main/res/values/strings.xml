@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <!-- Main activity -->
+    <string name="view_mode_rating">Top rated</string>
+    <string name="view_mode_popularity">Most popular</string>
+    <string name="view_mode_favorite_movies">My favorite movies</string>
     <!-- Sort menu strings-->
     <string name="menu_sort_method">Sort Movies by...</string>
     <string name="menu_sort_method_popularity">Sort Movies by Popularity</string>
