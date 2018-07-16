@@ -8,14 +8,23 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.udacity.androiddeveloper.daviladd.popularmovies.MainActivity;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
+import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.MovieTrailersAdapter;
+import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.PopularMoviesAdapter;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.TrailerList;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
 import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabase;
 import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabaseExecutors;
 import com.udacity.androiddeveloper.daviladd.popularmovies.databinding.ActivityMovieDetailBinding;
@@ -23,11 +32,16 @@ import com.udacity.androiddeveloper.daviladd.popularmovies.utilities.PopularMovi
 
 import java.text.DecimalFormat;
 
+import retrofit2.Call;
+import retrofit2.Retrofit;
+
 public class MovieDetailActivity extends AppCompatActivity {
     public final static String PARCELABLE_EXTRA_MOVIE = "MOVIE";
     private static final String TAG = MovieDetailActivity.class.getSimpleName();
     private MovieDetailViewModel mMovieDetailViewModel;
     private ActivityMovieDetailBinding mActivityMovieDetail;
+
+    private MovieTrailersAdapter mMovieTrailersAdapter;
 
     private boolean mIsFavorite;
 
@@ -46,9 +60,18 @@ public class MovieDetailActivity extends AppCompatActivity {
                 = ViewModelProviders.of(this).get(MovieDetailViewModel.class);
         // and observe the LiveData:
         mMovieDetailViewModel.getMovie().observe(this, movie -> {
-            if (movie != null) bindMovieToUI(movie);
+            if (movie != null) {
+                Log.d(TAG, "A movie has been received -> updating the UI");
+                bindMovieToUI(movie);
+            }
         });
 
+        mMovieDetailViewModel.getTrailers().observe(this, trailerList -> {
+            if (trailerList != null) {
+                Log.d(TAG, "A trailer list has been received -> updating the UI");
+                updateTrailers(trailerList);
+            }
+        });
 
         // Retrieve the movie instance which details are to be shown in this activity:
         Movie movie = getIntent().getParcelableExtra(PARCELABLE_EXTRA_MOVIE);
@@ -63,6 +86,20 @@ public class MovieDetailActivity extends AppCompatActivity {
             Log.d(TAG, "Opening detailed view for " + movie.getTitle());
             isMovieInFavorites(movie);
         }
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setLayoutManager(layoutManager);
+        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setHasFixedSize(true);
+        mMovieTrailersAdapter = new MovieTrailersAdapter(this, null);
+        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setAdapter(mMovieTrailersAdapter);
+
+        // Retrieve movie's trailers:
+        mMovieDetailViewModel.getMovieTrailers(getString(R.string.API_KEY_TMDB), movie.getId());
+
+    }
+
+    private void updateTrailers(TrailerList trailerList){
+        mMovieTrailersAdapter.updateTrailers(trailerList.getResults());
     }
 
     @Override
@@ -100,6 +137,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOn(null);
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOff(null);
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setOnCheckedChangeListener(new favoriteButtonOnCheckedChangedListener());
+
     }
 
     private void isMovieInFavorites(Movie movie) {
