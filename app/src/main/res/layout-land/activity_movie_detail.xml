@@ -31,15 +31,30 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
 
-                <include
-                    android:id="@+id/movie_details_header"
-                    layout="@layout/activity_movie_details_header"
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight=".50"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight=".50">
+
+                    <include
+                        android:id="@+id/movie_details_header"
+                        layout="@layout/activity_movie_details_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        />
+
+                    <include
+                        android:id="@+id/movie_details_trailers"
+                        layout="@layout/activity_movie_details_trailers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        />
+                </LinearLayout>
 
                 <include
                     android:id="@+id/movie_details_body"

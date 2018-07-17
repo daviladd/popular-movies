@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.MenuItem;
@@ -16,15 +15,10 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
-import com.udacity.androiddeveloper.daviladd.popularmovies.MainActivity;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
 import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.MovieTrailersAdapter;
-import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.PopularMoviesAdapter;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
-import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.TrailerList;
-import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
-import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
 import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabase;
 import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabaseExecutors;
 import com.udacity.androiddeveloper.daviladd.popularmovies.databinding.ActivityMovieDetailBinding;
@@ -32,14 +26,13 @@ import com.udacity.androiddeveloper.daviladd.popularmovies.utilities.PopularMovi
 
 import java.text.DecimalFormat;
 
-import retrofit2.Call;
-import retrofit2.Retrofit;
-
 public class MovieDetailActivity extends AppCompatActivity {
     public final static String PARCELABLE_EXTRA_MOVIE = "MOVIE";
     private static final String TAG = MovieDetailActivity.class.getSimpleName();
     private MovieDetailViewModel mMovieDetailViewModel;
     private ActivityMovieDetailBinding mActivityMovieDetail;
+
+    private FavoriteButtonOnCheckedChangedListener mFavoriteButtonOnCheckedChangedListener;
 
     private MovieTrailersAdapter mMovieTrailersAdapter;
 
@@ -132,12 +125,10 @@ public class MovieDetailActivity extends AppCompatActivity {
                 .setText(new DecimalFormat(".#").format(movie.getVoteAverage()));
         mActivityMovieDetail.movieDetailsBody.movieDetailsSynopsisValue.setText(movie.getOverview());
 
-        mActivityMovieDetail.movieDetailsHeader.favoriteStar.setChecked(mIsFavorite);
+        //mActivityMovieDetail.movieDetailsHeader.favoriteStar.setChecked(mIsFavorite);
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setText(null);
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOn(null);
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOff(null);
-        mActivityMovieDetail.movieDetailsHeader.favoriteStar.setOnCheckedChangeListener(new favoriteButtonOnCheckedChangedListener());
-
     }
 
     private void isMovieInFavorites(Movie movie) {
@@ -156,11 +147,16 @@ public class MovieDetailActivity extends AppCompatActivity {
                     mIsFavorite = false;
                 }
                 mMovieDetailViewModel.setMovie(movie);
+                mActivityMovieDetail.movieDetailsHeader.favoriteStar.setChecked(mIsFavorite);
+                if (null == mFavoriteButtonOnCheckedChangedListener) {
+                    mFavoriteButtonOnCheckedChangedListener = new FavoriteButtonOnCheckedChangedListener();
+                    mActivityMovieDetail.movieDetailsHeader.favoriteStar.setOnCheckedChangeListener(mFavoriteButtonOnCheckedChangedListener);
+                }
             }
         });
     }
 
-    private class favoriteButtonOnCheckedChangedListener
+    private class FavoriteButtonOnCheckedChangedListener
             implements CompoundButton.OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(CompoundButton favoriteButton, boolean isChecked) {

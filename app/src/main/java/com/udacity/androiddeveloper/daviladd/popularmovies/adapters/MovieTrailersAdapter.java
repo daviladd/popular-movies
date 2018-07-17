@@ -62,7 +62,7 @@ public class MovieTrailersAdapter extends RecyclerView.Adapter<MovieTrailersAdap
     @Override
     public void onBindViewHolder(MovieTrailersViewHolder holder, int position) {
         // Show movie title:
-        holder.trailerID.setText(mTrailerList.get(position).getId());
+        holder.trailerID.setText("Watch Trailer: " + mTrailerList.get(position).getName());
         // Show movie poster image:
 //        String thumbnailPath
 //                = PopularMoviesUtilities.TMDB_API_THUMBNAIL_PATH
