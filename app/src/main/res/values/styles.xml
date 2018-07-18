@@ -33,6 +33,7 @@
         <item name="android:layout_marginStart">@dimen/movie_detail_text_value_margin_start</item>
         <item name="android:layout_marginEnd">@dimen/movie_detail_text_value_margin_end</item>
         <item name="android:layout_marginTop">@dimen/movie_detail_text_value_margin_top</item>
+        <item name="android:layout_marginBottom">@dimen/movie_detail_text_value_margin_bottom</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
         <item name="android:textSize">@dimen/movie_detail_text_value_size</item>

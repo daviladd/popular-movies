@@ -64,7 +64,7 @@ public class MovieTrailersAdapter extends RecyclerView.Adapter<MovieTrailersAdap
         holder.trailerID.setText(mTrailerList.get(position).getName());
         // Show movie poster image:
         String thumbnailPath
-                = "http://img.youtube.com/vi/" + mTrailerList.get(position).getKey()+ "/0.jpg";
+                = "http://img.youtube.com/vi/" + mTrailerList.get(position).getKey() + "/0.jpg";
         Picasso.get().load(thumbnailPath).into(holder.trailerPosterThumbnail);
     }
 

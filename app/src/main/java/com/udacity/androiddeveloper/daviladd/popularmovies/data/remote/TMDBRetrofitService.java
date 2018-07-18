@@ -1,6 +1,7 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies.data.remote;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.ReviewList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.TrailerList;
 
 import retrofit2.Call;
@@ -24,6 +25,6 @@ public interface TMDBRetrofitService {
     @GET(TRAILERS)
     Call<TrailerList> getTrailersByMovie(@Path("movie_id") int movie_id, @Query(API_KEY) String apiKey);
 
-    //@GET(REVIEWS)
-    //Call<ReviewList> getReviewsByMovie(@Path("movie_id") int movie_id, @Query(API_KEY) String apiKey);
+    @GET(REVIEWS)
+    Call<ReviewList> getReviewsByMovie(@Path("movie_id") int movie_id, @Query(API_KEY) String apiKey);
 }

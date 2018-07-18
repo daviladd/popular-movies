@@ -16,8 +16,10 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
+import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.MovieReviewsAdapter;
 import com.udacity.androiddeveloper.daviladd.popularmovies.adapters.MovieTrailersAdapter;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
+import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.ReviewList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.TrailerList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabase;
 import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabaseExecutors;
@@ -35,6 +37,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private FavoriteButtonOnCheckedChangedListener mFavoriteButtonOnCheckedChangedListener;
 
     private MovieTrailersAdapter mMovieTrailersAdapter;
+    private MovieReviewsAdapter mMovieReviewsAdapter;
 
     private boolean mIsFavorite;
 
@@ -66,6 +69,13 @@ public class MovieDetailActivity extends AppCompatActivity {
             }
         });
 
+        mMovieDetailViewModel.getReviews().observe(this, reviewsList -> {
+            if (reviewsList != null) {
+                Log.d(TAG, "A review list has been received -> updating the UI");
+                updateReviews(reviewsList);
+            }
+        });
+
         // Retrieve the movie instance which details are to be shown in this activity:
         Movie movie = getIntent().getParcelableExtra(PARCELABLE_EXTRA_MOVIE);
         if (movie == null) {
@@ -80,19 +90,34 @@ public class MovieDetailActivity extends AppCompatActivity {
             isMovieInFavorites(movie);
         }
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setLayoutManager(layoutManager);
+
+        // Trailers section:
+        LinearLayoutManager trailersLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setLayoutManager(trailersLayoutManager);
         mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setHasFixedSize(true);
+        // Create the adapter:
         mMovieTrailersAdapter = new MovieTrailersAdapter(this, null);
         mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setAdapter(mMovieTrailersAdapter);
-
         // Retrieve movie's trailers:
         mMovieDetailViewModel.getMovieTrailers(getString(R.string.API_KEY_TMDB), movie.getId());
 
+        // Reviews section:
+        LinearLayoutManager reviewsLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mActivityMovieDetail.movieDetailsReviews.recyclerviewReviews.setLayoutManager(reviewsLayoutManager);
+        mActivityMovieDetail.movieDetailsReviews.recyclerviewReviews.setHasFixedSize(true);
+        // Create the adapter:
+        mMovieReviewsAdapter = new MovieReviewsAdapter(this, null);
+        mActivityMovieDetail.movieDetailsReviews.recyclerviewReviews.setAdapter(mMovieReviewsAdapter);
+        // Retrieve movie's trailers:
+        mMovieDetailViewModel.getMovieReviews(getString(R.string.API_KEY_TMDB), movie.getId());
     }
 
     private void updateTrailers(TrailerList trailerList){
         mMovieTrailersAdapter.updateTrailers(trailerList.getResults());
+    }
+
+    private void updateReviews(ReviewList reviewList){
+        mMovieReviewsAdapter.updateReviews(reviewList.getResults());
     }
 
     @Override
@@ -125,7 +150,6 @@ public class MovieDetailActivity extends AppCompatActivity {
                 .setText(new DecimalFormat(".#").format(movie.getVoteAverage()));
         mActivityMovieDetail.movieDetailsBody.movieDetailsSynopsisValue.setText(movie.getOverview());
 
-        //mActivityMovieDetail.movieDetailsHeader.favoriteStar.setChecked(mIsFavorite);
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setText(null);
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOn(null);
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOff(null);

@@ -24,6 +24,7 @@
     <dimen name="movie_detail_text_label_size">12sp</dimen>
     <!-- Text values -->
     <dimen name="movie_detail_text_value_margin_top">8dp</dimen>
+    <dimen name="movie_detail_text_value_margin_bottom">8dp</dimen>
     <dimen name="movie_detail_text_value_margin_start">8dp</dimen>
     <dimen name="movie_detail_text_value_margin_end">8dp</dimen>
     <dimen name="movie_detail_text_value_size">16sp</dimen>

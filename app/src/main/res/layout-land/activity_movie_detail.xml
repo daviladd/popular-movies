@@ -24,46 +24,62 @@
             android:textSize="24sp"
             tools:text="@string/debug_movie_details_title"/>
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <ScrollView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:baselineAligned="false">
+                android:layout_weight=".50"
+                android:fillViewport="true">
 
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight=".50">
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
                     <include
                         android:id="@+id/movie_details_header"
                         layout="@layout/activity_movie_details_header"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        />
+                        android:layout_height="wrap_content"/>
 
                     <include
                         android:id="@+id/movie_details_trailers"
                         layout="@layout/activity_movie_details_trailers"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        />
+                        android:layout_height="wrap_content"/>
                 </LinearLayout>
+            </ScrollView>
 
-                <include
-                    android:id="@+id/movie_details_body"
-                    layout="@layout/activity_movie_details_body"
-                    android:layout_width="0dp"
+            <ScrollView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".50"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight=".50"/>
+                    android:orientation="vertical">
 
-            </LinearLayout>
-        </ScrollView>
+                    <include
+                        android:id="@+id/movie_details_body"
+                        layout="@layout/activity_movie_details_body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <include
+                        android:id="@+id/movie_details_reviews"
+                        layout="@layout/activity_movie_details_reviews"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
     </LinearLayout>
 </layout>
