@@ -80,7 +80,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             isMovieInFavorites(movie);
         }
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setLayoutManager(layoutManager);
         mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setHasFixedSize(true);
         mMovieTrailersAdapter = new MovieTrailersAdapter(this, null);

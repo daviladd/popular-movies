@@ -2,8 +2,6 @@ package com.udacity.androiddeveloper.daviladd.popularmovies.adapters;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Trailer;
 import com.udacity.androiddeveloper.daviladd.popularmovies.utilities.PopularMoviesUtilities;
@@ -47,7 +46,7 @@ public class MovieTrailersAdapter extends RecyclerView.Adapter<MovieTrailersAdap
 
         switch (viewType) {
             case VIEW_TYPE_TRAILERS_THUMBNAIL_GRID:
-                layoutID = R.layout.movie_thumbnail_item;
+                layoutID = R.layout.movie_trailer_thumbnail_item;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid view type, value of " + viewType);
@@ -62,12 +61,11 @@ public class MovieTrailersAdapter extends RecyclerView.Adapter<MovieTrailersAdap
     @Override
     public void onBindViewHolder(MovieTrailersViewHolder holder, int position) {
         // Show movie title:
-        holder.trailerID.setText("Watch Trailer: " + mTrailerList.get(position).getName());
+        holder.trailerID.setText(mTrailerList.get(position).getName());
         // Show movie poster image:
-//        String thumbnailPath
-//                = PopularMoviesUtilities.TMDB_API_THUMBNAIL_PATH
-//                + mMovies.get(position).getPosterPath();
-//        Picasso.get().load(thumbnailPath).into(holder.moviePosterThumbnail);
+        String thumbnailPath
+                = "http://img.youtube.com/vi/" + mTrailerList.get(position).getKey()+ "/0.jpg";
+        Picasso.get().load(thumbnailPath).into(holder.trailerPosterThumbnail);
     }
 
     public void updateTrailers(List<Trailer> trailers) {
@@ -85,8 +83,8 @@ public class MovieTrailersAdapter extends RecyclerView.Adapter<MovieTrailersAdap
         MovieTrailersViewHolder(View view) {
             super(view);
 
-            trailerPosterThumbnail = view.findViewById(R.id.movie_poster_thumbnail_image);
-            trailerID = view.findViewById(R.id.movie_poster_thumbnail_title);
+            trailerPosterThumbnail = view.findViewById(R.id.movie_trailer_thumbnail_image);
+            trailerID = view.findViewById(R.id.movie_trailer_thumbnail_title);
 
             view.setOnClickListener(this);
         }

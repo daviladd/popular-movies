@@ -27,6 +27,7 @@
     <string name="movie_details_user_rating_over_label">/10</string>
     <string name="movie_details_release_year_label">Release Year</string>
     <string name="movie_details_synopsis_label">Synopsis</string>
+    <string name="movie_details_trailers_label">Trailers</string>
     <string name="movie_details_not_available">Movie details not available</string>
 
     <!-- Connection -->
