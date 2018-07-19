@@ -25,9 +25,9 @@ public class MovieReviewsAdapter extends RecyclerView.Adapter<MovieReviewsAdapte
     private static List<Review> mReviewList;
     private Context mContext;
 
-    public MovieReviewsAdapter(@NonNull Context context, List<Review> Reviews) {
+    public MovieReviewsAdapter(@NonNull Context context, List<Review> reviews) {
         mContext = context;
-        mReviewList = Reviews;
+        mReviewList = reviews;
     }
 
     @Override
@@ -63,9 +63,9 @@ public class MovieReviewsAdapter extends RecyclerView.Adapter<MovieReviewsAdapte
 
     }
 
-    public void updateReviews(List<Review> Reviews) {
+    public void updateReviews(List<Review> reviews) {
         Log.d(LOG_TAG, "Updating the Review lists");
-        mReviewList = Reviews;
+        mReviewList = reviews;
         notifyDataSetChanged();
     }
 

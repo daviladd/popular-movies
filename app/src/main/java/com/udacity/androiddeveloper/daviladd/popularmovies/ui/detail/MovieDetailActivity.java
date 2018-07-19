@@ -125,7 +125,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private void initializeUIReviews(Movie movie) {
         Log.d(TAG, "Setting up the Reviews view");
         // Reviews section:
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mActivityMovieDetail.movieDetailsReviews.recyclerviewReviews.setLayoutManager(layoutManager);
         mActivityMovieDetail.movieDetailsReviews.recyclerviewReviews.setHasFixedSize(true);
         // Create the adapter:
