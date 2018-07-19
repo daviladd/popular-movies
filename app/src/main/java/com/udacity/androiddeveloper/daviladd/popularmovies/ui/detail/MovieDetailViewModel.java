@@ -62,12 +62,17 @@ public class MovieDetailViewModel extends AndroidViewModel {
     }
 
     public void setMovie(Movie movie) {
-        Log.d(LOG_TAG, "MOVIE: setMovie");
-        mMovie.postValue(movie);
-        // Retrieve movie's trailers:
-        getMovieTrailers(getApplication().getApplicationContext().getString(R.string.API_KEY_TMDB), movie.getId());
-        // Retrieve movie's reviews:
-        getMovieReviews(getApplication().getApplicationContext().getString(R.string.API_KEY_TMDB), movie.getId());
+
+        if (!movie.equals(mMovie.getValue())) {
+            Log.d(LOG_TAG, "MOVIE: the movie is DIFFERENT than current one -> everything needs to be updated");
+            mMovie.postValue(movie);
+            // Retrieve movie's trailers:
+            getMovieTrailers(getApplication().getApplicationContext().getString(R.string.API_KEY_TMDB), movie.getId());
+            // Retrieve movie's reviews:
+            getMovieReviews(getApplication().getApplicationContext().getString(R.string.API_KEY_TMDB), movie.getId());
+        } else {
+            Log.d(LOG_TAG, "MOVIE: the movie is the SAME as current one -> nothing needs to be updated");
+        }
     }
 
     public MutableLiveData<Boolean> isMovieInFavorites() {
@@ -85,7 +90,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
         return mTrailers;
     }
 
-    public void setTrailers(TrailerList trailers) {
+    private void setTrailers(TrailerList trailers) {
         Log.d(LOG_TAG, "TRAILERS: setTrailers");
         mTrailersQuerySent = true;
         mTrailers.postValue(trailers);
@@ -116,7 +121,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
         return mReviews;
     }
 
-    public void setReviews(ReviewList reviewList) {
+    private void setReviews(ReviewList reviewList) {
         Log.d(LOG_TAG, "REVIEWS: setReviews");
         mReviewsQuerySent = true;
         mReviews.postValue(reviewList);
@@ -128,12 +133,13 @@ public class MovieDetailViewModel extends AndroidViewModel {
      * @param movieId Database ID of the movie
      */
     public void getMovieReviews(String apiKey, int movieId) {
-        Log.d(LOG_TAG, "REVIEWS: trying to retrieve Reviews from movies with ID " + movieId);
 
         if (mReviewsQuerySent) {
-            Log.d(LOG_TAG, "REVIEWS: the reviews were already retrieved before");
+            Log.d(LOG_TAG, "REVIEWS: the reviews were already retrieved before (NO QUERY TO TMDB)");
             return;
         }
+
+        Log.d(LOG_TAG, "REVIEWS: QUERYING TMDB to retrieve Reviews from movies with ID " + movieId);
 
         Retrofit retrofit = TMDBRetrofitClient.getClient();
         TMDBRetrofitService apiServiceTmdb = retrofit.create(TMDBRetrofitService.class);
@@ -146,11 +152,11 @@ public class MovieDetailViewModel extends AndroidViewModel {
         @Override
         public void onResponse(retrofit2.Call<TrailerList> call, Response<TrailerList> trailerListResponse) {
             if (trailerListResponse.isSuccessful()) {
-                Log.d(LOG_TAG, "TRAILERS: received a TrailerList");
+                Log.d(LOG_TAG, "TRAILERS: TMDB returned a TrailerList");
                 setTrailers(trailerListResponse.body());
             } else {
                 int statusCode = trailerListResponse.code();
-                Log.d(LOG_TAG, "TRAILERS: the TrailerList could not be retrieved: server returned errorcode " + statusCode);
+                Log.d(LOG_TAG, "TRAILERS: the TrailerList could not be retrieved: TMDB server returned errorcode " + statusCode);
                 // TODO: handle error on request depending on the status code
                 Log.e(LOG_TAG, trailerListResponse.message());
                 setTrailers(null);
@@ -159,7 +165,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
 
         @Override
         public void onFailure(retrofit2.Call<TrailerList> call, Throwable t) {
-            Log.d(LOG_TAG, "TRAILERS: the TrailerList could not be retrieved: no answer from Server");
+            Log.d(LOG_TAG, "TRAILERS: the TrailerList could not be retrieved: no answer from TMDB Server");
         }
     }
 
@@ -167,11 +173,11 @@ public class MovieDetailViewModel extends AndroidViewModel {
         @Override
         public void onResponse(retrofit2.Call<ReviewList> call, Response<ReviewList> reviewListResponse) {
             if (reviewListResponse.isSuccessful()) {
-                Log.d(LOG_TAG, "REVIEWS: received a ReviewList with " + reviewListResponse.body().getTotalResults() + " reviews");
+                Log.d(LOG_TAG, "REVIEWS: TMDB returned a ReviewList with " + reviewListResponse.body().getTotalResults() + " reviews");
                 setReviews(reviewListResponse.body());
             } else {
                 int statusCode = reviewListResponse.code();
-                Log.d(LOG_TAG, "REVIEWS: the ReviewList could not be retrieved: server returned errorcode " + statusCode);
+                Log.d(LOG_TAG, "REVIEWS: the ReviewList could not be retrieved: TMDB server returned errorcode " + statusCode);
                 // TODO: handle error on request depending on the status code
                 Log.e(LOG_TAG, reviewListResponse.message());
                 setReviews(null);
@@ -180,7 +186,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
 
         @Override
         public void onFailure(retrofit2.Call<ReviewList> call, Throwable t) {
-            Log.d(LOG_TAG, "REVIEWS: the ReviewList could not be retrieved: no answer from Server");
+            Log.d(LOG_TAG, "REVIEWS: the ReviewList could not be retrieved: no answer from TMDB Server");
         }
     }
 }
