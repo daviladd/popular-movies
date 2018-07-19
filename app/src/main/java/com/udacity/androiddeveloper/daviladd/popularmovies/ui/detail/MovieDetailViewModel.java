@@ -93,25 +93,6 @@ public class MovieDetailViewModel extends AndroidViewModel {
         mIsMovieInFavorites.postValue(isMovieInFavorites);
     }
 
-//    private void isMovieInFavorites(int movieID) {
-//        Log.d(LOG_TAG, "FAVORITES: checking if the movie is in the Favorite Movies DB");
-//        FavoriteMoviesDatabase favoriteMoviesDatabase
-//                = FavoriteMoviesDatabase.getInstance(getApplication().getApplicationContext());
-//        LiveData<Integer> dbMovieId = favoriteMoviesDatabase.movieDao().isMovieInFavorites(movieID);
-//        dbMovieId.observe(getApplication(), new Observer<Integer>() {
-//            @Override
-//            public void onChanged(@Nullable Integer movieId) {
-//                if (movieId != null) {
-//                    Log.d(LOG_TAG, "FAVORITES: movie is in the favorites list");
-//                    setIsMovieInFavorites(true);
-//                } else {
-//                    Log.d(LOG_TAG, "FAVORITES: movie is in not the favorites list");
-//                    setIsMovieInFavorites(false);
-//                }
-//            }
-//        });
-//    }
-
     public void updateMovieInFavorites(boolean setFavorite) {
         FavoriteMoviesDatabase favoriteMoviesDatabase
                 = FavoriteMoviesDatabase.getInstance(getApplication().getApplicationContext());
