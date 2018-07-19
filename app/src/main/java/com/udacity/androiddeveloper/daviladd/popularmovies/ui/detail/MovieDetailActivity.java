@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
@@ -33,8 +34,6 @@ public class MovieDetailActivity extends AppCompatActivity {
     private static final String TAG = MovieDetailActivity.class.getSimpleName();
     private MovieDetailViewModel mMovieDetailViewModel;
     private ActivityMovieDetailBinding mActivityMovieDetail;
-
-    private FavoriteButtonOnCheckedChangedListener mFavoriteButtonOnCheckedChangedListener;
 
     private MovieTrailersAdapter mMovieTrailersAdapter;
     private MovieReviewsAdapter mMovieReviewsAdapter;
@@ -80,6 +79,14 @@ public class MovieDetailActivity extends AppCompatActivity {
                 updateReviews(reviewsList);
             }
         });
+        // Now the favorite star to show that this movie is in the Favorite Movies DB:
+        Log.d(TAG, "FAVORITES: observing the ViewModel favorite LiveData");
+        mMovieDetailViewModel.isMovieInFavorites().observe(this, isInFavorites -> {
+            if (isInFavorites != null) {
+                Log.d(TAG, "FAVORITES: a review list has been received -> updating the UI");
+                updateFavoriteStar(isInFavorites);
+            }
+        });
         // Retrieve the movie instance which details are to be shown in this activity:
         Movie movie = getIntent().getParcelableExtra(PARCELABLE_EXTRA_MOVIE);
         if (movie == null) {
@@ -93,21 +100,29 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         Log.d(TAG, "Opening detailed view for " + movie.getTitle());
         // Initialize the UI elements:
-        trailersViewSetup(movie);
-        reviewsViewSetup(movie);
-        initializeUI();
+        initializeUI(movie);
 
-        isMovieInFavorites(movie);
+        isMovieInFavorites(movie.getId());
+
+        // Notify the ViewModel about the movie to be shown:
+        mMovieDetailViewModel.setMovie(movie);
     }
 
-    private void initializeUI() {
+    private void initializeUI(Movie movie) {
         // Set the favorite start to be displayed as designed:
+        initializeUIFavoriteStar();
+        initializeUITrailers(movie);
+        initializeUIReviews(movie);
+    }
+
+    private void initializeUIFavoriteStar() {
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setText(null);
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOn(null);
         mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOff(null);
+        mActivityMovieDetail.movieDetailsHeader.favoriteStar.setOnClickListener(new FavoriteButtonOnClickListener());
     }
 
-    private void reviewsViewSetup(Movie movie) {
+    private void initializeUIReviews(Movie movie) {
         Log.d(TAG, "Setting up the Reviews view");
         // Reviews section:
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -118,7 +133,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         mActivityMovieDetail.movieDetailsReviews.recyclerviewReviews.setAdapter(mMovieReviewsAdapter);
     }
 
-    private void trailersViewSetup(Movie movie) {
+    private void initializeUITrailers(Movie movie) {
         Log.d(TAG, "Setting up the Trailers view");
         // Trailers section:
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -135,6 +150,10 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     private void updateReviews(ReviewList reviewList){
         mMovieReviewsAdapter.updateReviews(reviewList.getResults());
+    }
+
+    private void updateFavoriteStar(boolean isFavorite) {
+        mActivityMovieDetail.movieDetailsHeader.favoriteStar.setChecked(isFavorite);
     }
 
     @Override
@@ -171,29 +190,31 @@ public class MovieDetailActivity extends AppCompatActivity {
         mActivityMovieDetail.movieDetailsBody.movieDetailsSynopsisValue.setText(movie.getOverview());
     }
 
-    private void isMovieInFavorites(Movie movie) {
+    private void isMovieInFavorites(int movieID) {
+        Log.d(TAG, "FAVORITES: checking if the movie is in the Favorite Movies DB");
         FavoriteMoviesDatabase favoriteMoviesDatabase
-                = FavoriteMoviesDatabase.getInstance(getApplicationContext());
-        LiveData<Integer> dbMovieId = favoriteMoviesDatabase.movieDao().isMovieInFavorites(movie.getId());
+                = FavoriteMoviesDatabase.getInstance(getApplication().getApplicationContext());
+        LiveData<Integer> dbMovieId = favoriteMoviesDatabase.movieDao().isMovieInFavorites(movieID);
         dbMovieId.observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable Integer movieId) {
-                Log.d(TAG, "movieId = " + movieId);
                 if (movieId != null) {
-                    Log.d(TAG, "Movie is in the favorites list");
-                    mIsFavorite = true;
+                    Log.d(TAG, "FAVORITES: movie is in the favorites list");
+                    mMovieDetailViewModel.setIsMovieInFavorites(true);
                 } else {
-                    Log.d(TAG, "Movie is in not the favorites list");
-                    mIsFavorite = false;
-                }
-                mMovieDetailViewModel.setMovie(movie);
-                mActivityMovieDetail.movieDetailsHeader.favoriteStar.setChecked(mIsFavorite);
-                if (null == mFavoriteButtonOnCheckedChangedListener) {
-                    mFavoriteButtonOnCheckedChangedListener = new FavoriteButtonOnCheckedChangedListener();
-                    mActivityMovieDetail.movieDetailsHeader.favoriteStar.setOnCheckedChangeListener(mFavoriteButtonOnCheckedChangedListener);
+                    Log.d(TAG, "FAVORITES: movie is in not the favorites list");
+                    mMovieDetailViewModel.setIsMovieInFavorites(false);
                 }
             }
         });
+    }
+
+    private class FavoriteButtonOnClickListener implements CompoundButton.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            mMovieDetailViewModel.updateMovieInFavorites(
+                    mActivityMovieDetail.movieDetailsHeader.favoriteStar.isChecked());
+        }
     }
 
     private class FavoriteButtonOnCheckedChangedListener

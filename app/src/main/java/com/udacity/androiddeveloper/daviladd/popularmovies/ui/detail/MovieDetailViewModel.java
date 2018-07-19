@@ -2,7 +2,10 @@ package com.udacity.androiddeveloper.daviladd.popularmovies.ui.detail;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
@@ -11,6 +14,8 @@ import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.ReviewList
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.TrailerList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitService;
+import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabase;
+import com.udacity.androiddeveloper.daviladd.popularmovies.database.FavoriteMoviesDatabaseExecutors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,12 +69,15 @@ public class MovieDetailViewModel extends AndroidViewModel {
     public void setMovie(Movie movie) {
 
         if (!movie.equals(mMovie.getValue())) {
+            int movieId = movie.getId();
             Log.d(LOG_TAG, "MOVIE: the movie is DIFFERENT than current one -> everything needs to be updated");
             mMovie.postValue(movie);
             // Retrieve movie's trailers:
-            getMovieTrailers(getApplication().getApplicationContext().getString(R.string.API_KEY_TMDB), movie.getId());
+            getMovieTrailers(getApplication().getApplicationContext().getString(R.string.API_KEY_TMDB), movieId);
             // Retrieve movie's reviews:
-            getMovieReviews(getApplication().getApplicationContext().getString(R.string.API_KEY_TMDB), movie.getId());
+            getMovieReviews(getApplication().getApplicationContext().getString(R.string.API_KEY_TMDB), movieId);
+//            // Check if the movie is in the Favorite Movies DB:
+//            isMovieInFavorites(movieId);
         } else {
             Log.d(LOG_TAG, "MOVIE: the movie is the SAME as current one -> nothing needs to be updated");
         }
@@ -80,9 +88,64 @@ public class MovieDetailViewModel extends AndroidViewModel {
         return mIsMovieInFavorites;
     }
 
-    private void setIsMovieInFavorites(boolean isMovieInFavorites) {
+    public void setIsMovieInFavorites(boolean isMovieInFavorites) {
         Log.d(LOG_TAG, "FAVORITES: setIsMovieInFavorites");
         mIsMovieInFavorites.postValue(isMovieInFavorites);
+    }
+
+//    private void isMovieInFavorites(int movieID) {
+//        Log.d(LOG_TAG, "FAVORITES: checking if the movie is in the Favorite Movies DB");
+//        FavoriteMoviesDatabase favoriteMoviesDatabase
+//                = FavoriteMoviesDatabase.getInstance(getApplication().getApplicationContext());
+//        LiveData<Integer> dbMovieId = favoriteMoviesDatabase.movieDao().isMovieInFavorites(movieID);
+//        dbMovieId.observe(getApplication(), new Observer<Integer>() {
+//            @Override
+//            public void onChanged(@Nullable Integer movieId) {
+//                if (movieId != null) {
+//                    Log.d(LOG_TAG, "FAVORITES: movie is in the favorites list");
+//                    setIsMovieInFavorites(true);
+//                } else {
+//                    Log.d(LOG_TAG, "FAVORITES: movie is in not the favorites list");
+//                    setIsMovieInFavorites(false);
+//                }
+//            }
+//        });
+//    }
+
+    public void updateMovieInFavorites(boolean setFavorite) {
+        FavoriteMoviesDatabase favoriteMoviesDatabase
+                = FavoriteMoviesDatabase.getInstance(getApplication().getApplicationContext());
+        if (setFavorite) {
+            // Add the movie to the favorite movies DB:
+            if (mIsMovieInFavorites.getValue()) {
+                // It is already in the DB. Right now this situation is impossible to happen
+                //  but who knows in the future...
+                // Update the entry:
+                Log.d(LOG_TAG, "FAVORITES: updating movie entry in the Favorite Movies DB");
+                favoriteMoviesDatabase.movieDao()
+                        .updateMovie(mMovie.getValue());
+            } else {
+                // Add the movie to favorites:
+                FavoriteMoviesDatabaseExecutors.getsInstance().databaseExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(LOG_TAG, "FAVORITES: adding movie to the Favorite Movies DB");
+                        favoriteMoviesDatabase.movieDao()
+                                .insertMovie(mMovie.getValue());
+                    }
+                });
+            }
+        } else {
+            // Remove the movie from favorites:
+            Log.d(LOG_TAG, "FAVORITES: removing movie from the Favorite Movies DB");
+            FavoriteMoviesDatabaseExecutors.getsInstance().databaseExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    favoriteMoviesDatabase.movieDao()
+                            .deleteMovie(mMovie.getValue());
+                }
+            });
+        }
     }
 
     public MutableLiveData<TrailerList> getTrailers() {

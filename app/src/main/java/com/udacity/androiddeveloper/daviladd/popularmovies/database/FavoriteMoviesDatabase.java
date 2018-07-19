@@ -26,7 +26,7 @@ public abstract class FavoriteMoviesDatabase extends RoomDatabase {
     public static FavoriteMoviesDatabase getInstance(Context context) {
         if (sInstance == null) {
             synchronized (LOCK) {
-                Log.d(TAG, "Creating new database instance");
+                Log.d(TAG, "FAVORITES: Creating new database instance");
                 sInstance = Room.databaseBuilder(
                         context.getApplicationContext(),
                         FavoriteMoviesDatabase.class,
@@ -34,7 +34,7 @@ public abstract class FavoriteMoviesDatabase extends RoomDatabase {
                         .build();
             }
         }
-        Log.d(TAG, "Returning the database instance");
+        Log.d(TAG, "FAVORITES: Returning the database instance");
         return sInstance;
     }
 
