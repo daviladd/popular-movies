@@ -48,10 +48,12 @@ public class MainActivity extends AppCompatActivity {
 
     private MovieList mMovieList;
     // TODO: the sorting method should be better saved as a preference!
-    private int mSortMethod;
+    //private int mSortMethod;
 
     // For the data binding:
     private ActivityMainBinding mActivityMain;
+
+    private MainViewModel mainViewModel;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         if (mMovieList != null) {
             outState.putParcelable(MOVIE_LIST_KEY, mMovieList);
         }
-        outState.putInt(SORT_METHOD_KEY, mSortMethod);
+        outState.putInt(SORT_METHOD_KEY, mainViewModel.getViewMode().getValue());
     }
 
     @Override
@@ -69,6 +71,22 @@ public class MainActivity extends AppCompatActivity {
         // Set the UI binding:
         mActivityMain = DataBindingUtil
                 .setContentView(this, R.layout.activity_main);
+
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        // Observe the viewMode:
+        Log.d(TAG, "VIEWMODE: observing the MainViewModel viewMode LiveData");
+        mainViewModel.getViewMode().observe(this, viewMode -> {
+            if (viewMode != null) {
+                Log.d(TAG, "VIEWMODE: the viewMode has been received -> updating the UI");
+                callMovieAPI(viewMode);
+            }
+        });
+        mainViewModel.getFavoriteMovies().observe(this, favoriteList -> {
+            // TODO
+            if (mainViewModel.getViewMode().getValue() == SORT_METHOD_USER_FAVORITES) {
+                updateUI(SORT_METHOD_USER_FAVORITES, favoriteList);
+            }
+        });
 
         // TODO: the number of columns and the size of the movies' posters, should be adaptable
         //  to the device's screen characteristics
@@ -90,15 +108,39 @@ public class MainActivity extends AppCompatActivity {
                 mMovieList = savedInstanceState.getParcelable(MOVIE_LIST_KEY);
                 loadingIndicatorHide();
                 if (savedInstanceState.getInt(SORT_METHOD_KEY) == SORT_METHOD_USER_FAVORITES) {
-                    callMovieAPI(SORT_METHOD_USER_FAVORITES);
+                    updateUI(SORT_METHOD_USER_FAVORITES, mainViewModel.getFavoriteMovies().getValue());
+                } else {
+                    mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
                 }
-                mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
             }
         } else {
             // TODO: store the sorting method as a setting, so when the app is started, the user
             //      gets the same sorting method as when app was closed/destroyed.
-            callMovieAPI(SORT_METHOD_DEFAULT);
+            // callMovieAPI(SORT_METHOD_DEFAULT);
+            mainViewModel.setViewMode(SORT_METHOD_DEFAULT);
+            //callMovieAPI(mainViewModel.getViewMode().getValue());
         }
+    }
+
+    private void updateUI(int viewMode, List<Movie> movieList) {
+        switch (viewMode) {
+            case SORT_METHOD_POPULARITY:
+                Log.d(TAG, getString(R.string.debug_menu_sort_method_popularity));
+                mActivityMain.tvViewMode.setText(R.string.view_mode_popularity);
+                break;
+            case SORT_METHOD_USER_RATING:
+                Log.d(TAG, getString(R.string.debug_menu_sort_method_rating));
+                mActivityMain.tvViewMode.setText(R.string.view_mode_rating);
+                break;
+            case SORT_METHOD_USER_FAVORITES:
+                Log.d(TAG, getString(R.string.debug_menu_sort_method_user_favorites));
+                mActivityMain.tvViewMode.setText(R.string.view_mode_favorite_movies);
+                break;
+            default:
+                Log.d(TAG, getString(R.string.debug_menu_sort_method_unknown));
+                break;
+        }
+        mPopularMoviesAdapter.updateAnswers(movieList);
     }
 
     @Override
@@ -114,15 +156,15 @@ public class MainActivity extends AppCompatActivity {
         // Handle item selection
         switch (itemId) {
             case R.id.menu_sort_method_popularity:
-                mSortMethod = SORT_METHOD_POPULARITY;
+                mainViewModel.setViewMode(SORT_METHOD_POPULARITY);
                 callMovieAPI(SORT_METHOD_POPULARITY);
                 return true;
             case R.id.menu_sort_method_rating:
-                mSortMethod = SORT_METHOD_USER_RATING;
+                mainViewModel.setViewMode(SORT_METHOD_USER_RATING);
                 callMovieAPI(SORT_METHOD_USER_RATING);
                 return true;
             case R.id.menu_sort_method_favorite_movies:
-                mSortMethod = SORT_METHOD_USER_FAVORITES;
+                mainViewModel.setViewMode(SORT_METHOD_USER_FAVORITES);
                 callMovieAPI(SORT_METHOD_USER_FAVORITES);
                 return true;
             default:
@@ -177,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<Movie> movies) {
                 Log.d(TAG, "Updating the favorite movies list from the LiveData in ViewModel");
                 loadingIndicatorHide();
-                if (mSortMethod != SORT_METHOD_USER_FAVORITES) {
+                if (mainViewModel.getViewMode().getValue() != SORT_METHOD_USER_FAVORITES) {
                     mainViewModel.getFavoriteMovies().removeObserver(this);
                     Log.d(TAG, "Sorting method is not user favorites");
                     return;
@@ -187,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                     for (Movie movie : movies) {
                         Log.d(TAG, movie.getTitle());
                     }
-                    mPopularMoviesAdapter.updateAnswers(movies);
+                    updateUI(SORT_METHOD_USER_FAVORITES, movies);
                 } else {
                     Log.d(TAG, "The user's favorite list is empty");
                 }
@@ -251,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, getString(R.string.mlc_onresponse_successful));
                 mMovieList = movieListResponse.body();
                 // Notify the adapter that we have new data and the activity needs to be updated:
-                mPopularMoviesAdapter.updateAnswers(mMovieList.getResults());
+                updateUI(mainViewModel.getViewMode().getValue(), mMovieList.getResults());
             } else {
                 Log.d(TAG, getString(R.string.mlc_onresponse_failure));
                 int statusCode = movieListResponse.code();
