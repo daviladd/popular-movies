@@ -44,6 +44,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate has been called");
 
         // To add the "up" navigation button:
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -55,27 +56,30 @@ public class MovieDetailActivity extends AppCompatActivity {
         mMovieDetailViewModel
                 = ViewModelProviders.of(this).get(MovieDetailViewModel.class);
         // and observe the LiveData:
+        // First the movie to be shown:
+        Log.d(TAG, "MOVIE: observing the ViewModel movie LiveData");
         mMovieDetailViewModel.getMovie().observe(this, movie -> {
             if (movie != null) {
-                Log.d(TAG, "A movie has been received -> updating the UI");
-                bindMovieToUI(movie);
+                Log.d(TAG, "MOVIE: a movie has been received -> updating the UI");
+                updateMovieDetails(movie);
             }
         });
-
+        // Then the trailers for this movie:
+        Log.d(TAG, "TRAILERS: observing the ViewModel TrailerList LiveData");
         mMovieDetailViewModel.getTrailers().observe(this, trailerList -> {
             if (trailerList != null) {
-                Log.d(TAG, "A trailer list has been received -> updating the UI");
+                Log.d(TAG, "TRAILERS: a trailer list has been received -> updating the UI");
                 updateTrailers(trailerList);
             }
         });
-
+        // Then, the user reviews of this movie:
+        Log.d(TAG, "REVIEWS: observing the ViewModel ReviewList LiveData");
         mMovieDetailViewModel.getReviews().observe(this, reviewsList -> {
             if (reviewsList != null) {
-                Log.d(TAG, "A review list has been received -> updating the UI");
+                Log.d(TAG, "REVIEWS: a review list has been received -> updating the UI");
                 updateReviews(reviewsList);
             }
         });
-
         // Retrieve the movie instance which details are to be shown in this activity:
         Movie movie = getIntent().getParcelableExtra(PARCELABLE_EXTRA_MOVIE);
         if (movie == null) {
@@ -85,31 +89,44 @@ public class MovieDetailActivity extends AppCompatActivity {
                     getString(R.string.movie_details_not_available),
                     Toast.LENGTH_LONG);
             finish();
-        } else {
-            Log.d(TAG, "Opening detailed view for " + movie.getTitle());
-            isMovieInFavorites(movie);
         }
 
+        Log.d(TAG, "Opening detailed view for " + movie.getTitle());
+        // Initialize the UI elements:
+        trailersViewSetup(movie);
+        reviewsViewSetup(movie);
+        initializeUI();
 
-        // Trailers section:
-        LinearLayoutManager trailersLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setLayoutManager(trailersLayoutManager);
-        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setHasFixedSize(true);
-        // Create the adapter:
-        mMovieTrailersAdapter = new MovieTrailersAdapter(this, null);
-        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setAdapter(mMovieTrailersAdapter);
-        // Retrieve movie's trailers:
-        mMovieDetailViewModel.getMovieTrailers(getString(R.string.API_KEY_TMDB), movie.getId());
+        isMovieInFavorites(movie);
+    }
 
+    private void initializeUI() {
+        // Set the favorite start to be displayed as designed:
+        mActivityMovieDetail.movieDetailsHeader.favoriteStar.setText(null);
+        mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOn(null);
+        mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOff(null);
+    }
+
+    private void reviewsViewSetup(Movie movie) {
+        Log.d(TAG, "Setting up the Reviews view");
         // Reviews section:
-        LinearLayoutManager reviewsLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mActivityMovieDetail.movieDetailsReviews.recyclerviewReviews.setLayoutManager(reviewsLayoutManager);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mActivityMovieDetail.movieDetailsReviews.recyclerviewReviews.setLayoutManager(layoutManager);
         mActivityMovieDetail.movieDetailsReviews.recyclerviewReviews.setHasFixedSize(true);
         // Create the adapter:
         mMovieReviewsAdapter = new MovieReviewsAdapter(this, null);
         mActivityMovieDetail.movieDetailsReviews.recyclerviewReviews.setAdapter(mMovieReviewsAdapter);
-        // Retrieve movie's trailers:
-        mMovieDetailViewModel.getMovieReviews(getString(R.string.API_KEY_TMDB), movie.getId());
+    }
+
+    private void trailersViewSetup(Movie movie) {
+        Log.d(TAG, "Setting up the Trailers view");
+        // Trailers section:
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setLayoutManager(layoutManager);
+        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setHasFixedSize(true);
+        // Create the adapter:
+        mMovieTrailersAdapter = new MovieTrailersAdapter(this, null);
+        mActivityMovieDetail.movieDetailsTrailers.recyclerviewTrailers.setAdapter(mMovieTrailersAdapter);
     }
 
     private void updateTrailers(TrailerList trailerList){
@@ -136,23 +153,22 @@ public class MovieDetailActivity extends AppCompatActivity {
      *
      * @param movie Movie which details are to be shown
      */
-    private void bindMovieToUI(Movie movie) {
-
+    private void updateMovieDetails(Movie movie) {
+        // Set the movie title:
+        mActivityMovieDetail.movieDetailsTitle.setText(movie.getTitle());
+        // Set the movie thumbnail:
         String thumbnailPath
                 = PopularMoviesUtilities.TMDB_API_THUMBNAIL_PATH
                 + movie.getPosterPath();
         Picasso.get().load(thumbnailPath).into(mActivityMovieDetail.movieDetailsHeader.movieDetailsPosterThumbnail);
-
-        mActivityMovieDetail.movieDetailsTitle.setText(movie.getTitle());
+        // Set the release year:
         mActivityMovieDetail.movieDetailsHeader.movieDetailsReleaseDate
                 .setText(Integer.toString(movie.getReleaseYear()));
+        // Set the user rating:
         mActivityMovieDetail.movieDetailsHeader.movieDetailsUserRatingValue
                 .setText(new DecimalFormat(".#").format(movie.getVoteAverage()));
+        // Set the overview:
         mActivityMovieDetail.movieDetailsBody.movieDetailsSynopsisValue.setText(movie.getOverview());
-
-        mActivityMovieDetail.movieDetailsHeader.favoriteStar.setText(null);
-        mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOn(null);
-        mActivityMovieDetail.movieDetailsHeader.favoriteStar.setTextOff(null);
     }
 
     private void isMovieInFavorites(Movie movie) {

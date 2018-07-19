@@ -1,13 +1,12 @@
 package com.udacity.androiddeveloper.daviladd.popularmovies.ui.detail;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.udacity.androiddeveloper.daviladd.popularmovies.R;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.Movie;
-import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.MovieList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.ReviewList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.model.TrailerList;
 import com.udacity.androiddeveloper.daviladd.popularmovies.data.remote.TMDBRetrofitClient;
@@ -18,7 +17,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class MovieDetailViewModel extends ViewModel {
+public class MovieDetailViewModel extends AndroidViewModel {
     private final String LOG_TAG = MovieDetailViewModel.class.getSimpleName();
     /* MutableLiveData vs LiveData:
 
@@ -38,36 +37,56 @@ public class MovieDetailViewModel extends ViewModel {
     */
     // The movie to be displayed in the UI:
     private MutableLiveData<Movie> mMovie;
-    private boolean mTrailersQuerySent;
     private MutableLiveData<TrailerList> mTrailers;
-    private boolean mReviewsQuerySent;
     private MutableLiveData<ReviewList> mReviews;
+    private MutableLiveData<Boolean> mIsMovieInFavorites;
 
-    public MovieDetailViewModel() {
+    private boolean mTrailersQuerySent;
+    private boolean mReviewsQuerySent;
+
+
+    public MovieDetailViewModel(Application application) {
+        super(application);
+        Log.d(LOG_TAG, "Creating the MovieDetailViewModel");
         mMovie = new MutableLiveData<>();
-        mTrailersQuerySent = false;
         mTrailers = new MutableLiveData<>();
-        mReviewsQuerySent = false;
         mReviews = new MutableLiveData<>();
+        mIsMovieInFavorites = new MutableLiveData<>();
+        mTrailersQuerySent = false;
+        mReviewsQuerySent = false;
     }
 
     public MutableLiveData<Movie> getMovie() {
+        Log.d(LOG_TAG, "MOVIE: getMovie");
         return mMovie;
     }
 
     public void setMovie(Movie movie) {
+        Log.d(LOG_TAG, "MOVIE: setMovie");
         mMovie.postValue(movie);
-        mTrailersQuerySent = false;
-        mTrailers.postValue(null);
-        mReviewsQuerySent = false;
-        mReviews.postValue(null);
+        // Retrieve movie's trailers:
+        getMovieTrailers(getApplication().getApplicationContext().getString(R.string.API_KEY_TMDB), movie.getId());
+        // Retrieve movie's reviews:
+        getMovieReviews(getApplication().getApplicationContext().getString(R.string.API_KEY_TMDB), movie.getId());
+    }
+
+    public MutableLiveData<Boolean> isMovieInFavorites() {
+        Log.d(LOG_TAG, "FAVORITES: isMovieInFavorites");
+        return mIsMovieInFavorites;
+    }
+
+    private void setIsMovieInFavorites(boolean isMovieInFavorites) {
+        Log.d(LOG_TAG, "FAVORITES: setIsMovieInFavorites");
+        mIsMovieInFavorites.postValue(isMovieInFavorites);
     }
 
     public MutableLiveData<TrailerList> getTrailers() {
+        Log.d(LOG_TAG, "TRAILERS: getTrailers");
         return mTrailers;
     }
 
     public void setTrailers(TrailerList trailers) {
+        Log.d(LOG_TAG, "TRAILERS: setTrailers");
         mTrailersQuerySent = true;
         mTrailers.postValue(trailers);
     }
@@ -78,10 +97,10 @@ public class MovieDetailViewModel extends ViewModel {
      * @param movieId Database ID of the movie
      */
     public void getMovieTrailers(String apiKey, int movieId) {
-        Log.d(LOG_TAG, "Trying to retrieve trailers from movies with ID " + movieId);
+        Log.d(LOG_TAG, "TRAILERS: trying to retrieve trailers from movies with ID " + movieId);
 
         if (mTrailersQuerySent) {
-            Log.d(LOG_TAG, "The trailers were already retrieved before");
+            Log.d(LOG_TAG, "TRAILERS: the trailers were already retrieved before");
             return;
         }
 
@@ -92,32 +111,13 @@ public class MovieDetailViewModel extends ViewModel {
         call.enqueue(new MovieDetailViewModel.TrailerListCallback());
     }
 
-    private class TrailerListCallback implements Callback<TrailerList> {
-        @Override
-        public void onResponse(retrofit2.Call<TrailerList> call, Response<TrailerList> trailerListResponse) {
-            if (trailerListResponse.isSuccessful()) {
-                Log.d(LOG_TAG, "Received a TrailerList");
-                setTrailers(trailerListResponse.body());
-            } else {
-                int statusCode = trailerListResponse.code();
-                Log.d(LOG_TAG, "The TrailerList could not be retrieved: server returned errorcode " + statusCode);
-                // TODO: handle error on request depending on the status code
-                Log.e(LOG_TAG, trailerListResponse.message());
-                setTrailers(null);
-            }
-        }
-
-        @Override
-        public void onFailure(retrofit2.Call<TrailerList> call, Throwable t) {
-            Log.d(LOG_TAG, "The TrailerList could not be retrieved: no answer from Server");
-        }
-    }
-
     public MutableLiveData<ReviewList> getReviews() {
+        Log.d(LOG_TAG, "REVIEWS: getReviews");
         return mReviews;
     }
 
     public void setReviews(ReviewList reviewList) {
+        Log.d(LOG_TAG, "REVIEWS: setReviews");
         mReviewsQuerySent = true;
         mReviews.postValue(reviewList);
     }
@@ -128,10 +128,10 @@ public class MovieDetailViewModel extends ViewModel {
      * @param movieId Database ID of the movie
      */
     public void getMovieReviews(String apiKey, int movieId) {
-        Log.d(LOG_TAG, "Trying to retrieve Reviews from movies with ID " + movieId);
+        Log.d(LOG_TAG, "REVIEWS: trying to retrieve Reviews from movies with ID " + movieId);
 
         if (mReviewsQuerySent) {
-            Log.d(LOG_TAG, "The reviews were already retrieved before");
+            Log.d(LOG_TAG, "REVIEWS: the reviews were already retrieved before");
             return;
         }
 
@@ -142,15 +142,36 @@ public class MovieDetailViewModel extends ViewModel {
         call.enqueue(new MovieDetailViewModel.ReviewListCallback());
     }
 
+    private class TrailerListCallback implements Callback<TrailerList> {
+        @Override
+        public void onResponse(retrofit2.Call<TrailerList> call, Response<TrailerList> trailerListResponse) {
+            if (trailerListResponse.isSuccessful()) {
+                Log.d(LOG_TAG, "TRAILERS: received a TrailerList");
+                setTrailers(trailerListResponse.body());
+            } else {
+                int statusCode = trailerListResponse.code();
+                Log.d(LOG_TAG, "TRAILERS: the TrailerList could not be retrieved: server returned errorcode " + statusCode);
+                // TODO: handle error on request depending on the status code
+                Log.e(LOG_TAG, trailerListResponse.message());
+                setTrailers(null);
+            }
+        }
+
+        @Override
+        public void onFailure(retrofit2.Call<TrailerList> call, Throwable t) {
+            Log.d(LOG_TAG, "TRAILERS: the TrailerList could not be retrieved: no answer from Server");
+        }
+    }
+
     private class ReviewListCallback implements Callback<ReviewList> {
         @Override
         public void onResponse(retrofit2.Call<ReviewList> call, Response<ReviewList> reviewListResponse) {
             if (reviewListResponse.isSuccessful()) {
-                Log.d(LOG_TAG, "Received a ReviewList with " + reviewListResponse.body().getTotalResults() + " reviews");
+                Log.d(LOG_TAG, "REVIEWS: received a ReviewList with " + reviewListResponse.body().getTotalResults() + " reviews");
                 setReviews(reviewListResponse.body());
             } else {
                 int statusCode = reviewListResponse.code();
-                Log.d(LOG_TAG, "The ReviewList could not be retrieved: server returned errorcode " + statusCode);
+                Log.d(LOG_TAG, "REVIEWS: the ReviewList could not be retrieved: server returned errorcode " + statusCode);
                 // TODO: handle error on request depending on the status code
                 Log.e(LOG_TAG, reviewListResponse.message());
                 setReviews(null);
@@ -159,7 +180,7 @@ public class MovieDetailViewModel extends ViewModel {
 
         @Override
         public void onFailure(retrofit2.Call<ReviewList> call, Throwable t) {
-            Log.d(LOG_TAG, "The ReviewList could not be retrieved: no answer from Server");
+            Log.d(LOG_TAG, "REVIEWS: the ReviewList could not be retrieved: no answer from Server");
         }
     }
 }
